@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>EvidenSecure - Sign Up</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="" name="keywords">
+    <meta content="" name="description">
+    {% load static %}
+    <!-- Favicons -->
+    <link href="{% static 'img/favicon.png' %}" rel="icon">
+    <link href="{% static 'img/apple-touch-icon.png' %}" rel="apple-touch-icon">
+  
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,700|Open+Sans:300,300i,400,400i,700,700i" rel="stylesheet">
+  
+    <!-- Bootstrap CSS File -->
+    <link href="{% static 'lib/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  
+    <!-- Libraries CSS Files -->
+    <link href="{% static 'lib/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet">
+    <link href="{% static 'lib/ionicons/css/ionicons.min.css' %}" rel="stylesheet">
+    <link href="{% static 'lib/aos/aos.css' %}" rel="stylesheet">
+    <link href="{% static 'lib/magnific-popup/magnific-popup.css' %}" rel="stylesheet">
+  
+    <!-- Main Stylesheet File -->
+    <link href="{% static 'css/login.css' %}" rel="stylesheet">
+</head>
+<body>
+    <div class="wrapper">
+      <form action="#">
+        <h2>Login</h2>
+        <div class="input-field">
+          <input type="text" required>
+          <label>Enter your email</label>
+        </div>
+        <div class="input-field">
+          <input type="password" required>
+          <label>Enter your password</label>
+        </div>
+        <div class="forget">
+          <label for="remember">
+            <input type="checkbox" id="remember">
+            <p>Remember me</p>
+          </label>
+          <a href="#">Forgot password?</a>
+        </div>
+        <button type="submit">Log In</button>
+        <div class="register">
+          <p>Don't have an account? <a href="{% url 'signup'%}">Register</a></p>
+        </div>
+      </form>
+    </div>
+  </body>
+  </html>
