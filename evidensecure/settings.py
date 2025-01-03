@@ -123,8 +123,10 @@ USE_TZ = True
 # Static files settings
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    BASE_DIR / "evidence/static",  # Folder for your app's static files
+    BASE_DIR / "evidence"/"static",  # Folder for your app's static files
 ]
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
 
 TEMPLATES = [
     {
