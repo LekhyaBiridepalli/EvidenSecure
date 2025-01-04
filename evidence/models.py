@@ -1,3 +1,10 @@
-from django.db import models
+from djongo import models
 
-# Create your models here.
+class Evidence(models.Model):
+    title = models.CharField(max_length=100)
+    description = models.TextField()
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    file = models.FileField(upload_to='evidence_files/')
+
+    def __str__(self):
+        return self.title

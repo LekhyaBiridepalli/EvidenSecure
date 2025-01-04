@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Evidence</title>
+</head>
+<body>
+    <h1>Upload Evidence</h1>
+    <form id="evidence-form" method="POST" enctype="multipart/form-data" action="upload_evidence/">
+        <label for="case_id">Case ID:</label>
+        <input type="text" id="case_id" name="case_id" required><br><br>
+
+        <label for="evidence_type">Evidence Type:</label>
+        <input type="text" id="evidence_type" name="evidence_type" required><br><br>
+
+        <label for="evidence_description">Description:</label>
+        <textarea id="evidence_description" name="evidence_description"></textarea><br><br>
+
+        <label for="collected_by">Collected By:</label>
+        <input type="text" id="collected_by" name="collected_by"><br><br>
+
+        <label for="upload_date">Upload Date:</label>
+        <input type="date" id="upload_date" name="upload_date"><br><br>
+
+        <label for="remarks">Remarks:</label>
+        <textarea id="remarks" name="remarks"></textarea><br><br>
+
+        <label for="files">Upload Files:</label>
+        <input type="file" id="files" name="files" multiple><br><br>
+
+        <button type="submit">Submit Evidence</button>
+    </form>
+</body>
+</html>
