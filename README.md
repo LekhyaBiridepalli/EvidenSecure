@@ -127,4 +127,4 @@
 ---
 
 ## License
-This project is licensed under the [MIT License](https://github.com/ifrahnz26/EvidenSecure/tree/main?tab=MIT-1-ov-file).
+This project is licensed under the [MIT License](https://github.com/ifrahnz26/EvidenSecure/blob/main/LICENSE).
