@@ -7,7 +7,7 @@ EvidenSecure is a robust web-based platform designed for law enforcement agencie
 ## **Contributors**
 
 - [Ifrah Naaz](https://github.com/ifrahnz26)  - 1MS22CS064
-- [Lekhya Biridapalli](https://github.com/LekhyaBiridepalli)  - 1MS22CS079
+- [Lekhya Biridepalli](https://github.com/LekhyaBiridepalli)  - 1MS22CS079
 - [Ishika Mohol](https://github.com/justishika)  - 1MS22CS069
 
 ---
