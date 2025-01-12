@@ -279,7 +279,9 @@ def cases(request):
                     "case_type": decrypt_content(case["case_type"]),
                     "court_case_number" : decrypt_content(case["court_case_number"]),
                     "accused_names": [decrypt_content(name) for name in case.get("accused_names", [])],
-                    "victim_names": [decrypt_content(name) for name in case.get("victim_names", [])]
+                    "victim_names": [decrypt_content(name) for name in case.get("victim_names", [])],
+                    "case_status": [decrypt_content(case["case_status"])]
+
                 }
                 for case in all_cases
             ]
