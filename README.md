@@ -111,19 +111,20 @@
 
 ## Database Design
 ### Collections
-#### Users: Stores user information like name, email, and hashed passwords.
-#### Evidence: Manages evidence files and associated metadata.
-#### Cases: Tracks cases linked to evidence and investigators.
+1. Users: Stores user information like name, email, and hashed passwords.
+2. Evidence: Manages evidence files and associated metadata.
+3. Cases: Tracks cases linked to evidence and investigators.
 
 ---
 
 ## Technologies Used
-### Frontend: HTML, CSS, JavaScript
-### Backend: Django
-### Database: MongoDB
-###Server: Django Development Server
-###Tools: Python, GridFS
+1. Frontend: HTML, CSS, JavaScript
+2. Backend: Django
+3. Database: MongoDB
+4. Server: Django Development Server
+5. Tools: Python, GridFS
 
+---
 
-##License
+## License
 This project is licensed under the [MIT License].
