@@ -41,7 +41,6 @@ EvidenSecure is a robust web-based platform designed for law enforcement agencie
 <img width="300" height ="200" alt="Screenshot 2025-01-12 at 6 22 59 PM" src="https://github.com/user-attachments/assets/a2e24a52-f88a-42bd-bace-300b832a9913" />
 <img width="300" height ="200" alt="Screenshot 2025-01-12 at 6 23 20 PM" src="https://github.com/user-attachments/assets/89788f6a-4ca2-404d-a3f6-884dbc48f485" />
 <img width="300" height ="200"  alt="Screenshot 2025-01-12 at 6 23 41 PM" src="https://github.com/user-attachments/assets/8bf511cd-9415-42da-bb66-7588491b57e5" />
-<img width="300" height ="200" alt="Screenshot 2025-01-12 at 6 23 52 PM" src="https://github.com/user-attachments/assets/f0cf8f7b-d03f-447e-b911-6f43c0de5815" />
 <img width="300" height ="200" alt="Screenshot 2025-01-12 at 6 40 43 PM" src="https://github.com/user-attachments/assets/30160d16-947a-44f1-a039-989afa0f026f" />
 <img width="300" height ="200" alt="Screenshot 2025-01-12 at 6 35 43 PM" src="https://github.com/user-attachments/assets/c3beac41-29ab-4a37-a5e3-24d6d0712046" />
 <img width="300" height ="200" alt="Screenshot 2025-01-12 at 6 40 28 PM" src="https://github.com/user-attachments/assets/a30d2c60-075e-4738-99f8-5ae9d2a7cac1" />
