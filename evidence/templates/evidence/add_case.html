@@ -29,19 +29,30 @@
             <li class="nav-item"><a class="nav-link text-white" href="{% url 'dashboard' %}">Homepage</a></li>
             <li class="nav-item"><a class="nav-link text-white" href="{% url 'cases' %}">Cases Management</a></li>
             <li class="nav-item"><a class="nav-link text-white" href="{% url 'evidence' %}">Evidence Management</a></li>
-            <li class="nav-item"><a class="nav-link text-white" href="#reports">Reports</a></li>
-            <li class="nav-item"><a class="nav-link text-white" href="#tracking">Tracking System</a></li>
-            <li class="nav-item"><a class="nav-link text-white" href="#logs">Audit Logs</a></li>
-            <li class="nav-item"><a class="nav-link text-white" href="#settings">Settings</a></li>
+            <li class="nav-item"><a class="nav-link text-white" href="#profile">Profile</a></li>
         </ul>
     </aside>
 
     <!-- Main Content -->
     <div class="container" style="margin-left: 250px; padding-top: 20px;">
         <header class="d-flex justify-content-between align-items-center mb-4">
-            <h1>EvidenSecure - Add Case</h1>
+            <h1>EvidenSecure- Add Case</h1>
+            <div class="d-flex align-items-center">
+                <button class="btn btn-light me-2" title="Notifications">
+                    <i class="fas fa-bell"></i>
+                </button>
+                <div class="dropdown">
+                    <button class="btn btn-light dropdown-toggle" type="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        Profile
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="profileDropdown">
+                        <li><a class="dropdown-item" href="#">Profile</a></li>
+                        <li><a class="dropdown-item" href="#">Settings</a></li>
+                        <li><a class="dropdown-item" href="{% url 'home' %}">Logout</a></li>
+                    </ul>
+                </div>
+            </div>
         </header>
-
         <!-- Add Case Form -->
         <section id="add_case" class="mb-4">
             <form method="post" action="{% url 'add_case' %}">
@@ -75,10 +86,8 @@
                 <div class="mb-3">
                     <label for="case_status" class="form-label">Case Status</label>
                     <select class="form-select" id="case_status" name="case_status" required>
-                        <option value="Open">Open</option>
                         <option value="Under Investigation">Under Investigation</option>
                         <option value="Closed">Closed</option>
-                        <option value="Disposed">Disposed</option>
                     </select>
                 </div>
 

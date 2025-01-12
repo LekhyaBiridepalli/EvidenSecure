@@ -19,21 +19,46 @@
 
     <!-- FontAwesome for icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Dashboard Overview */
+        #overview .card {
+            margin-bottom: 20px; /* Adjust bottom margin */
+        }
+        
+        #overview .row {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap; /* Allow the columns to wrap to the next line on smaller screens */
+        }
+        
+        #overview .col-md-2 {
+            width: 30%; /* Increase width for wider boxes */
+            margin-bottom: 20px; /* Adjust bottom margin */
+        }
+        
+        @media (max-width: 768px) {
+            #overview .col-md-2 {
+                width: 48%; /* Adjust width on smaller screens */
+            }
+        }
+        
+        @media (max-width: 576px) {
+            #overview .col-md-2 {
+                width: 100%; /* Make boxes stack on very small screens */
+            }
+        }
+    </style>
 </head>
 <body>
 
     <!-- Sidebar -->
     <aside class="bg-primary text-white p-4" style="position: fixed; top: 0; left: 0; bottom: 0; width: 250px;">
-        <!-- <h2><b>EvidenSecure</b></h2> -->
         <br><br><br>
         <ul class="nav flex-column">
-            <li class="nav-item"><a class="nav-link text-white" href="{% url 'dashboard' %}"">Homepage</a></li>
+            <li class="nav-item"><a class="nav-link text-white" href="{% url 'dashboard' %}">Homepage</a></li>
             <li class="nav-item"><a class="nav-link text-white" href="{% url 'cases' %}">Cases Management</a></li>
-            <li class="nav-item"><a class="nav-link text-white" href="{% url 'evidence' %}"">Evidence Management</a></li>
-            <li class="nav-item"><a class="nav-link text-white" href="#reports">Reports</a></li>
-            <li class="nav-item"><a class="nav-link text-white" href="#tracking">Tracking System</a></li>
-            <li class="nav-item"><a class="nav-link text-white" href="#logs">Audit Logs</a></li>
-            <li class="nav-item"><a class="nav-link text-white" href="#settings">Settings</a></li>
+            <li class="nav-item"><a class="nav-link text-white" href="{% url 'evidence' %}">Evidence Management</a></li>
+            <li class="nav-item"><a class="nav-link text-white" href="#profile">Profile</a></li>
         </ul>
     </aside>
 
@@ -42,7 +67,6 @@
         <header class="d-flex justify-content-between align-items-center mb-4">
             <h1>EvidenSecure Dashboard</h1>
             <div class="d-flex align-items-center">
-                <span class="me-3">Welcome, Inspector [Name]!</span>
                 <button class="btn btn-light me-2" title="Notifications">
                     <i class="fas fa-bell"></i>
                 </button>
@@ -60,65 +84,47 @@
         </header>
 
         <!-- Dashboard Overview -->
-       <!-- Dashboard Overview -->
-<section id="overview" class="mb-4">
-    <h2>Dashboard Overview</h2>
-    <div class="row">
-        <div class="col-md-2">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h3>Total Cases</h3>
-                    <p id="total-cases">0</p>
+        <section id="overview" class="mb-4">
+            <h2>Dashboard Overview</h2>
+            <div class="row">
+                <div class="col-md-2">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h3>Total Cases</h3>
+                            <p id="total-cases">{{ total_cases }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h3>Under Investigation</h3>
+                            <p id="under-investigation-cases">{{ under_investigation_cases }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h3>Closed Cases</h3>
+                            <p id="closed-cases">{{ closed_cases }}</p>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-md-2">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h3>Active Cases</h3>
-                    <p id="active-cases">0</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-2">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h3>Pending Evidence</h3>
-                    <p id="pending-evidence">0</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-2">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h3>Closed Cases</h3>
-                    <p id="closed-cases">0</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-2">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h3>Reports Generated</h3>
-                    <p id="reports-generated">0</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+        </section>
 
         <!-- Profile Details -->
         <section id="profile-details" class="mb-4">
             <h2>Profile Details</h2>
             <div class="card">
-                <div class="card-body">
-                    <h5>Officer Name: [Officer Name]</h5>
-                    <p>Badge Number: [Badge Number]</p>
-                    <p>Department: [Department]</p>
-                    <p>Current Location: [Location]</p>
-                    <p>Login Timestamp: [Login Time]</p>
-                    <p>Last Activity: [Last Activity]</p>
-                </div>
+                <p>Officer Name: {{ user_data.name }}</p>
+            <p>Badge Number: {{ user_data.badge_number }}</p>
+            <p>Role: {{ user_data.role }}</p>
+            <p>Email: {{ user_data.email }}</p>
+            <p>Contact Number: {{ user_data.contact_number }}</p>
+            <p>Department: {{ user_data.department }}</p>
+            <p>Account Created: {{ user_data.created_at|date:"Y-m-d H:i" }}</p>
             </div>
         </section>
 

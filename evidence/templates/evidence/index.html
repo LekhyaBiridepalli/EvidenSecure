@@ -22,6 +22,8 @@
   <!-- Libraries CSS Files -->
   <link href="{% static 'lib/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet">
   <link href="{% static 'lib/ionicons/css/ionicons.min.css' %}" rel="stylesheet">
+  <link href="https://unpkg.com/ionicons@4.5.10-0/dist/css/ionicons.min.css" rel="stylesheet">
+
   <link href="{% static 'lib/aos/aos.css' %}" rel="stylesheet">
   <link href="{% static 'lib/magnific-popup/magnific-popup.css' %}" rel="stylesheet">
 
@@ -44,23 +46,6 @@
           <li class="menu-active"><a href="#intro">Home</a></li>
           <li><a href="#about">About Us</a></li>
           <li><a href="#more-features">Features</a></li>
-          <!-- <li><a href="#pricing">Pricing</a></li> -->
-          <li><a href="#team">Team</a></li>
-          <!-- <li><a href="#gallery">Gallery</a></li> -->
-          <!-- <li class="menu-has-children"><a href="">Drop Down</a>
-            <ul>
-              <li><a href="#">Drop Down 1</a></li>
-              <li class="menu-has-children"><a href="#">Drop Down 2</a>
-                <ul>
-                  <li><a href="#">Deep Drop Down 1</a></li>
-                  <li><a href="#">Deep Drop Down 2</a></li>
-                  <li><a href="#">Deep Drop Down 3</a></li>
-                  <li><a href="#">Deep Drop Down 4</a></li>
-                  <li><a href="#">Deep Drop Down 5</a></li>
-                </ul>
-              </li>
-            </ul>
-          </li> -->
           <li><a href="#contact">Contact Us</a></li>
         </ul>
       </nav>
@@ -72,11 +57,11 @@
 ============================-->
 <section id="intro">
   <div class="intro-text">
-    <h3>Welcome to EvidenSecure</h3>
-<p>Safeguarding truth, one case at a time.</p>
-<blockquote>
-  <p><em>"सच्चाई ही न्याय है।" – महात्मा गांधी (Truth is justice.)</em></p>
-</blockquote>
+    <h2>Welcome to EvidenSecure</h2>
+    <p>Safeguarding truth, one case at a time.</p>
+    <blockquote>
+      <p><em>"सच्चाई ही न्याय है।" – महात्मा गांधी <br>(Truth is justice.)</em></p>
+    </blockquote>
     <a href="{% url 'signup'%}" class="btn-get-started scrollto">Sign Up</a>
     <a href="{% url 'login' %}" class="btn-get-started scrollto">Log In</a>
   </div>
@@ -105,52 +90,46 @@
           <h3 class="section-title">About Us</h3>
           <span class="section-divider"></span>
           <p class="section-description">
-            At <strong>Secure Digital Evidence</strong>, we are reshaping the future of digital evidence management.<br>
-            Our platform provides ironclad security and efficient management tools tailored for law enforcement and legal teams,<br>
-            ensuring that every digital piece of evidence remains intact, safeguarded, and ready for action.<br>
-            Backed by a team of cybersecurity and forensic experts, we offer an impenetrable solution<br>
-            for collecting, storing, and presenting digital evidence.<br>
-            We are on a mission to make the process smarter, safer, and more transparent—<br>
-            because we believe in one truth: in the fight against digital crime, the truth must always prevail.
+            At <strong>Secure Digital Evidence</strong>, we provide secure, efficient tools for managing digital evidence, ensuring its integrity and readiness for action. <br>
+            Backed by cybersecurity experts, we aim to make evidence management smarter, safer, and more transparent.
           </p>
         </div>
 
         <div class="row">
           <div class="col-lg-6 about-img" data-aos="fade-right">
-            <img src="{% static 'img/about-img.jpg' %}" alt="">
+            <img src="{% static 'img/about-us.jpg' %}" alt="">
           </div>
 
           <div class="col-lg-6 content" data-aos="fade-left">
-            <h2>Why Choose Us?</h2>
-            <h3>Your digital evidence, always secure and accessible.</h3>
+            <h2>Revolutionizing Digital Evidence Management for Government Agencies</h2>
+            <h3>Ensuring the integrity, security, and transparency of digital evidence across all government operations.</h3>
             <p>
-              We understand the critical nature of digital evidence in solving crimes and ensuring justice. Our platform is designed to offer state-of-the-art security while ensuring smooth and quick access when it matters most.
+                At <strong>EvidenSecure</strong>, we empower government agencies with robust, secure, and efficient tools to manage digital evidence. Our platform is designed to preserve the integrity of sensitive data while offering seamless management for investigations, trials, and legal procedures.
             </p>
+    
             <ul>
-              <li><i class="ion-android-checkmark-circle"></i> State-of-the-art encryption to safeguard evidence.</li>
-              <li><i class="ion-android-checkmark-circle"></i>Seamless user experience for law enforcement and legal teams. </li>
-              <li><i class="ion-android-checkmark-circle"></i> Tamper-proof solutions for storing and presenting evidence</li>
+                <li><i class="ion-android-checkmark-circle"></i> Secure collection and storage of digital evidence to prevent tampering.</li>
+                <li><i class="ion-android-checkmark-circle"></i> Immutable and auditable chain of custody to ensure legal compliance.</li>
+                <li><i class="ion-android-checkmark-circle"></i> Real-time tracking and access to evidence for government agencies and legal teams.</li>
             </ul>
-
+    
             <p>
-              At <strong>EvidenSecure</strong>, we are committed to providing a platform that ensures the integrity of digital evidence at every step. From collection to storage to presentation, we keep the truth secure, making sure it stands tall in the face of justice.
-          </div>
+                With <strong>EvidenSecure</strong>, government departments can ensure the confidentiality and integrity of digital evidence, enabling more efficient case management, faster investigation processing, and stronger legal outcomes. Our platform is designed to meet the highest standards of cybersecurity and legal compliance, making it an indispensable tool for modern government agencies.
+            </p>
+        </div>
         </div>
       </div>
     </section>
 
-    <!DOCTYPE html>
-<html lang="en">
 
-<head>
+<!-- <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Product Features</title>
-  <!-- Link CSS -->
   <link href="{% static 'css/style.css' %}" rel="stylesheet">
   <link href="{% static 'css/responsive.css' %}" rel="stylesheet">
   <link href="{% static 'css/aos.css' %}" rel="stylesheet">
-</head>
+</head> -->
   
 
   <section id="more-features" class="section-bg">
@@ -159,44 +138,47 @@
       <div class="section-header">
         <h3 class="section-title">Features</h3>
         <span class="section-divider"></span>
-        <p class="section-description">Unlock the power of seamless and secure digital evidence management with our state-of-the-art features.
-        </p></p>
+        <p class="section-description">Unlock the power of seamless and secure digital evidence management with our state-of-the-art features.</p>
       </div>
   
       <div class="row">
   
         <div class="col-lg-6">
           <div class="box" data-aos="fade-right">
-            <div class="icon"><i class="ion-ios-stopwatch-outline"></i></div>
-            <h4 class="title"><a href="">Efficient Time Management</a></h4>
-            <p class="description">Our platform helps streamline your workflow with time-saving tools and features that maximize productivity and minimize delays.</p>
+            <div class="icon"><i class="ion-ios-analytics-outline"></i></div>
+            <h4 class="title"><a href="">Robust Security</a></h4>
+            <p class="description">EvidenSecure employs advanced encryption methods to protect digital evidence from unauthorized access, ensuring confidentiality and integrity.</p>
           </div>
         </div>
-        
+  
         <div class="col-lg-6">
           <div class="box" data-aos="fade-left">
-            <div class="icon"><i class="ion-ios-bookmarks-outline"></i></div>
-            <h4 class="title"><a href="">Knowledge Hub</a></h4>
-            <p class="description">Access a wealth of resources and learning materials designed to help you grow your skills and stay ahead in your field.</p>
+            <div class="icon"><i class="ion-ios-time-outline"></i></div>
+            <h4 class="title"><a href="">Immutable Evidence</a></h4>
+            <p class="description">Once evidence is uploaded, it cannot be altered, maintaining the integrity of the evidence and ensuring its legal admissibility.</p>
           </div>
         </div>
-        
+  
         <div class="col-lg-6">
           <div class="box" data-aos="fade-right">
-            <div class="icon"><i class="ion-ios-heart-outline"></i></div>
-            <h4 class="title"><a href="">User-Centric Design</a></h4>
-            <p class="description">We prioritize user experience by offering intuitive interfaces and a seamless, enjoyable journey through our platform.</p>
+            <div class="icon"><i class="ion-ios-folder-outline"></i></div>
+            <h4 class="title"><a href="">Secure File Storage</a></h4>
+            <p class="description">Evidence files are securely stored using encrypted storage methods, ensuring sensitive data remains protected from unauthorized access or tampering.</p>
           </div>
         </div>
-        
+  
         <div class="col-lg-6">
           <div class="box" data-aos="fade-left">
-            <div class="icon"><i class="ion-ios-analytics-outline"></i></div>
-            <h4 class="title"><a href="">Actionable Insights</a></h4>
-            <p class="description">Our powerful analytics engine provides real-time insights, helping you make data-driven decisions that drive success.</p>
+            <div class="icon"><i class="ion-ios-paper-outline"></i></div>
+            <h4 class="title"><a href="">Compliant with Legal Standards</a></h4>
+            <p class="description">The platform is built to adhere to industry standards and legal requirements for evidence management, ensuring compliance for law enforcement.</p>
           </div>
         </div>
-        
+  
+</div>
+
+    </div>
+  </section>
 
   <!--==========================
         Call to Action Section
@@ -209,84 +191,15 @@
           <p class="cta-text">Join us now to streamline your workflow, enhance productivity, and unlock a world of learning resources designed just for you.</p>
         </div>
         <div class="col-lg-3 cta-btn-container text-center">
-          <a class="cta-btn align-middle" href="#">Get Started</a>
+          <a class="cta-btn align-middle" href="#">Join Us</a>
         </div>
       </div>
     </div>
   </section>
+
   
-    <!--==========================
-      Our Team Section
-    ============================-->
-    <section id="team" class="section-bg">
-      <div class="container">
-        <div class="section-header">
-          <h3 class="section-title">Our Team</h3>
-          <span class="section-divider"></span>
-          <p class="section-description">
-            We deliver the best! Our team is composed of experts who are dedicated to providing exceptional solutions and driving innovation in the field. With diverse skills and a collaborative mindset, we work together to ensure the success of every project. Whether it's through problem-solving, creative thinking, or technical expertise, we are committed to making a positive impact and achieving excellence.
-          </p>
-        </div>
-        <div class="row" data-aos="fade-up">
-          <div class="col-lg-3 col-md-6">
-            <div class="member">
-              <div class="pic"><img src="{% static 'img/team/team-1.jpg' %}" alt=""></div>
-              <h4>Ifrah Naaz    </h4>
-              <span>Chief Executive Officer</span>
-              <div class="social">
-                <a href=""><i class="fa fa-twitter"></i></a>
-                <a href=""><i class="fa fa-facebook"></i></a>
-                <a href=""><i class="fa fa-google-plus"></i></a>
-                <a href=""><i class="fa fa-linkedin"></i></a>
-              </div>
-            </div>
-          </div>
 
-          <div class="col-lg-3 col-md-6">
-            <div class="member">
-              <div class="pic"><img src="{% static 'img/team/team-2.jpg' %}" alt=""></div>
-              <h4>Ifrah Naaz    </h4>
-              <span>Product Manager</span>
-              <div class="social">
-                <a href=""><i class="fa fa-twitter"></i></a>
-                <a href=""><i class="fa fa-facebook"></i></a>
-                <a href=""><i class="fa fa-google-plus"></i></a>
-                <a href=""><i class="fa fa-linkedin"></i></a>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-3 col-md-6">
-            <div class="member">
-              <div class="pic"><img src="{% static 'img/team/team-3.jpg' %}" alt=""></div>
-              <h4>Ifrah Naaz    </h4>
-              <span>CTO</span>
-              <div class="social">
-                <a href=""><i class="fa fa-twitter"></i></a>
-                <a href=""><i class="fa fa-facebook"></i></a>
-                <a href=""><i class="fa fa-google-plus"></i></a>
-                <a href=""><i class="fa fa-linkedin"></i></a>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-3 col-md-6">
-            <div class="member">
-              <div class="pic"><img src="{% static 'img/team/team-4.jpg' %}" alt=""></div>
-              <h4>Ifrah Naaz    </h4>
-              <span>Accountant</span>
-              <div class="social">
-                <a href=""><i class="fa fa-twitter"></i></a>
-                <a href=""><i class="fa fa-facebook"></i></a>
-                <a href=""><i class="fa fa-google-plus"></i></a>
-                <a href=""><i class="fa fa-linkedin"></i></a>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </section><!-- #team -->
+    
 
     
     <!--==========================
@@ -298,8 +211,8 @@
 
           <div class="col-lg-4 col-md-4">
             <div class="contact-about">
-              <h3>Contact Us</h3>
-              <p>Bang bang Kiss kiss</p>
+              <h3>Avilon</h3>
+              <p>Cras fermentum odio eu feugiat. Justo eget magna fermentum iaculis eu non diam phasellus. Scelerisque felis imperdiet proin fermentum leo. Amet volutpat consequat mauris nunc congue.</p>
               <div class="social-links">
                 <a href="#" class="twitter"><i class="fa fa-twitter"></i></a>
                 <a href="#" class="facebook"><i class="fa fa-facebook"></i></a>
@@ -312,23 +225,24 @@
 
           <div class="col-lg-3 col-md-4">
             <div class="info">
-              <div class="d-flex align-items-center mb-3">
+              <div>
                 <i class="ion-ios-location-outline"></i>
-                <p class="ml-3">A108 Adam Street<br>New York, NY 535022</p>
+                <p>A108 Adam Street<br>New York, NY 535022</p>
               </div>
-          
-              <div class="d-flex align-items-center mb-3">
+
+              <div>
                 <i class="ion-ios-email-outline"></i>
-                <p class="ml-3">Secure@eviSec.com</p>
+                <p>info@example.com</p>
               </div>
-          
-              <div class="d-flex align-items-center">
+
+              <div>
                 <i class="ion-ios-telephone-outline"></i>
-                <p class="ml-3">+91 1112225550</p>
+                <p>+1 5589 55488 55s</p>
               </div>
+
             </div>
           </div>
-          
+
           <div class="col-lg-5 col-md-8">
             <div class="form">
               <div id="sendmessage">Your message has been sent. Thank you!</div>
@@ -381,7 +295,7 @@
               Licensing information: https://bootstrapmade.com/license/
               Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/buy/?theme=Avilon
             -->
-            Designed by <a href="https://bootstrapmade.com/">Yours truly</a>
+            Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
           </div>
         </div>
         <div class="col-lg-6">

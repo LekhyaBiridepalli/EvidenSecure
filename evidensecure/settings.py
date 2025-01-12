@@ -85,14 +85,23 @@ WSGI_APPLICATION = 'evidensecure.wsgi.application'
 #     }
 # }
 from pymongo import MongoClient
+# SESSION_ENGINE = 'evidensecure.mongodb_session'
+# settings.py
 
-MONGO_DB_NAME = "EvidenSecure_db"
-MONGO_HOST = "localhost"
-MONGO_PORT = 27017
+# settings.py
+
+SESSION_ENGINE = "django.contrib.sessions.backends.file"
+SESSION_FILE_PATH = None  # Use the default temp directory, or specify a custom path
+
+
+
+
+MONGODB_DATABASE = "EvidenSecure_db"
+MONGODB_URI = 'mongodb://localhost:27017'
 
 # Initialize the client
-mongo_client = MongoClient(MONGO_HOST, MONGO_PORT)
-mongo_db = mongo_client[MONGO_DB_NAME]
+# mongo_client = MongoClient(MONGO_HOST, MONGO_PORT)
+# mongo_db = mongo_client[MONGO_DB_NAME]
 
 
 
@@ -169,3 +178,4 @@ TEMPLATES = [
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+

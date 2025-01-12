@@ -1,190 +1,3 @@
-import hashlib
-from django.shortcuts import render
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib import messages
-from .db import *  # Import the MongoDB connection
-from .utils import *
-
-
-
-
-
-# Create your views here.
-def home(request):
-    return render(request, 'evidence/index.html')
-
-# def login_view(request):
-#     if request.method == 'POST':
-#         username = request.POST['logemail']
-#         password = request.POST['logpass']
-
-#         # Authenticate the user
-#         user = authenticate(request, username=username, password=password)
-
-#         if user is not None:
-#             login(request, user)
-#             return redirect('home')  # Redirect to a home or dashboard page after login
-#         else:
-#             messages.error(request, 'Invalid credentials. Please try again.')
-#             return render(request, 'evidence/login.html')
-
-#     return render(request, 'evidence/login.html')
-def login_view(request):
-    if request.method == 'POST':
-        # Bypass authentication for testing purposes
-        return redirect('dashboard')  # Directly redirect to the dashboard page
-    
-    return render(request, 'evidence/login.html')
-
-# View for the signup page
-def signup_view(request):
-    if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Account created successfully. You can log in now!')
-            return redirect('login')  # Redirect to login page after successful signup
-        else:
-            messages.error(request, 'There was an error. Please try again.')
-            return render(request, 'evidence/signup.html', {'form': form})
-    else:
-        form = UserCreationForm()
-    return render(request, 'evidence/signup.html', {'form': form})
-
-# View for logging out the user
-def logout_view(request):
-    logout(request)
-    return redirect('home')  # Redirect to the login page after logout
-
-def dashboard(request):
-    return render(request, 'evidence/dashboard.html')
-
-def cases(request):
-    # You can pass any context data related to cases here if needed
-    return render(request, 'evidence/cases.html')
-
-# Evidence Management View
-def evidence(request):
-    # You can pass any context data related to cases here if needed
-    return render(request, 'evidence/evidence.html')
-
-
-from bson import ObjectId
-from datetime import datetime, timezone
-from django.shortcuts import render, redirect
-from django.http import JsonResponse, HttpResponse
-import json
-
-def add_case(request):
-    if request.method == 'POST':
-        try:
-            # Capture form data
-            case_type = request.POST.get('case_type')
-            case_date = request.POST.get('case_date')
-            investigating_officer = request.POST.get('investigating_officer')
-            case_status = request.POST.get('case_status')
-            accused_names = request.POST.getlist('accused_names')  # Get multiple accused names
-            victim_names = request.POST.getlist('victim_names')  # Get multiple victim names
-            court_case_number = request.POST.get('court_case_number', '')
-            remarks = request.POST.get('remarks', '')
-            charges = request.POST.getlist('charges')  # Get multiple charges
-
-            # Validate required fields
-            if not case_type or not case_date or not investigating_officer or not case_status:
-                return JsonResponse({"error": "Missing required fields: case_type, case_date, investigating_officer, case_status"}, status=400)
-
-            # Convert case_date to datetime
-            try:
-                case_date = datetime.strptime(case_date, "%Y-%m-%d")
-            except ValueError:
-                return JsonResponse({"error": "Invalid date format. Use YYYY-MM-DD."}, status=400)
-
-            # Generate a new case_id as ObjectId
-            case_id = ObjectId()  # This will create a valid ObjectId
-
-            # Prepare the new case data
-            new_case = {
-                "case_id": case_id,  # case_id should be ObjectId
-                "case_type": case_type,
-                "case_date": case_date,
-                "investigating_officer": investigating_officer,
-                "case_status": case_status,
-                "accused_names": accused_names,  # Store as a list
-                "victim_names": victim_names,  # Store as a list
-                "court_case_number": court_case_number,
-                "remarks": remarks,
-                "charges": charges  # Store as a list
-            }
-
-            # Insert the case into MongoDB
-            result = cases_collection.insert_one(new_case)
-
-            # Redirect to the case list or show a success message
-            return redirect('cases')  # Or return a success message as you see fit
-
-        except Exception as e:
-            # Handle any errors and send back a response
-            return JsonResponse({"error": str(e)}, status=500)
-
-    # If method is GET, render the add_case form
-    return render(request, 'evidence/add_case.html')
-
-
-
-def case_detail(request, case_id):
-    # Fetch the case details using ObjectId
-    try:
-        case = cases_collection.find_one({"_id": ObjectId(case_id)})
-    except Exception as e:
-        return HttpResponse(f"Error: {e}", status=400)
-    
-    if not case:
-        return HttpResponse("Case not found", status=404)
-
-    # Convert ObjectId to string for display
-    case["id"] = str(case["_id"])
-    case["case_date"] = case["case_date"].strftime('%Y-%m-%d')  # Format the date as string
-
-    return render(request, "evidence/case_detail.html", {"case": case})
-
-
-def cases(request):
-    search_results = []
-    
-    # If there is a query in the search input
-    query = request.GET.get('query', '')
-    
-    # If the search query exists, filter cases based on the query
-    if query:
-        search_results = cases_collection.find({
-            "$or": [
-                {"case_type": {"$regex": query, "$options": "i"}},  # Search in case_type
-                {"accused_names": {"$regex": query, "$options": "i"}},  # Search in accused_names
-                {"victim_names": {"$regex": query, "$options": "i"}}  # Search in victim_names
-            ]
-        })
-    else:
-        # Fetch all cases if no search query is provided
-        search_results = cases_collection.find()
-
-    all_cases = cases_collection.find()
-    all_cases = [{**case, "case_id": str(case["_id"])} for case in all_cases]
-    search_results = [{**case, "case_id": str(case["_id"])} for case in search_results]
-
-    return render(request, 'evidence/cases.html', { 'all_cases': all_cases,'search_results': search_results })
-
-
-from django.shortcuts import render, redirect
-from django.conf import settings
-from pymongo import MongoClient
-from bson import ObjectId
-import gridfs
-import os
-
-from django.core.files.uploadedfile import InMemoryUploadedFile
-
 
 # def evidence_view(request):
 #     # Get the court_case_number from GET request
@@ -215,12 +28,6 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 # from django.utils import timezone
 
 # fs = gridfs.GridFS(db)
-
-
-
-import logging
-# # # Initialize logger
-logger = logging.getLogger(__name__)
 
 # # def add_evidence(request):
 # #     if request.method == 'POST':
@@ -518,15 +325,6 @@ logger = logging.getLogger(__name__)
 
 #     return render(request, 'add_evidence.html')
 
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import padding
-from django.utils.crypto import get_random_string
-import base64
-from django.utils import timezone
-
-# Key for AES encryption (for demonstration, use a secure method to store/retrieve keys)
-SECRET_KEY = b'YourSecureKeyHere'  # 16 bytes for AES-128 (or 32 bytes for AES-256)
 
 # Function to encrypt content using AES encryption
 # def encrypt_content(content):
@@ -883,41 +681,6 @@ SECRET_KEY = b'YourSecureKeyHere'  # 16 bytes for AES-128 (or 32 bytes for AES-2
 #     # Decode the decrypted content to return as a string (assuming it was originally a UTF-8 string)
 #     return decrypted_content.decode('utf-8')
 
-from django.shortcuts import render
-from django.http import HttpResponse
-from django.conf import settings
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-from cryptography.hazmat.backends import default_backend
-from pymongo import MongoClient
-from bson import ObjectId
-import base64
-import gridfs
-import os
-from datetime import datetime
-
-
-fs = gridfs.GridFS(db)
-
-# Encryption and Decryption functions
-def get_cipher():
-    key = settings.ENCRYPTION_KEY  # Already in bytes
-    iv = settings.ENCRYPTION_IV  # Already in bytes
-    cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
-    return cipher
-
-def encrypt_content(plain_text):
-    cipher = get_cipher()
-    encryptor = cipher.encryptor()
-    padded_data = plain_text + (16 - len(plain_text) % 16) * ' '
-    encrypted_data = encryptor.update(padded_data.encode('utf-8')) + encryptor.finalize()
-    return base64.b64encode(encrypted_data).decode('utf-8')
-
-def decrypt_content(encrypted_text):
-    cipher = get_cipher()
-    decryptor = cipher.decryptor()
-    encrypted_data = base64.b64decode(encrypted_text)
-    decrypted_data = decryptor.update(encrypted_data) + decryptor.finalize()
-    return decrypted_data.decode('utf-8').rstrip()  # Remove padding
 
 # from cryptography.hazmat.primitives import padding
 # from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
@@ -942,13 +705,6 @@ def decrypt_content(encrypted_text):
 #     # Return the decrypted text as a string
 #     return unpadded_data.decode('utf-8')
 
-# Helper function to get case by court case number
-def get_case_by_number(court_case_number):
-    return cases_collection.find_one({'court_case_number': court_case_number})
-
-# Helper function to get evidence by case ID
-def get_evidence_by_case_id(case_id):
-    return list(evidence_collection.find({'case_id': case_id}))
 
 # Function to add evidence with encryption (WORKS)
 # def add_evidence(request):
@@ -997,21 +753,7 @@ def get_evidence_by_case_id(case_id):
 #         # return HttpResponse("Evidence added successfully", status=200)
 #     return render(request, 'evidence/add_evidence.html')
 
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import padding
 
-def encrypt_file(file_data):
-    # Encrypt the file content using the same key and IV from settings
-    cipher = Cipher(algorithms.AES(settings.ENCRYPTION_KEY), modes.CBC(settings.ENCRYPTION_IV), backend=default_backend())
-    encryptor = cipher.encryptor()
-
-    # Pad the file data
-    padder = padding.PKCS7(128).padder()
-    padded_data = padder.update(file_data) + padder.finalize()
-
-    encrypted_data = encryptor.update(padded_data) + encryptor.finalize()
-    return encrypted_data
 
 # def add_evidence(request):
 #     if request.method == 'POST':
@@ -1061,10 +803,430 @@ def encrypt_file(file_data):
 
 #     return render(request, 'evidence/add_evidence.html')
 
+
+import hashlib
+import json
+import logging
+import base64
+import os
+from datetime import datetime, timezone
+
+from django.conf import settings
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib import messages
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.http import JsonResponse, HttpResponse
+from django.shortcuts import render, redirect
+from django.utils import timezone
+from django.utils.crypto import get_random_string
+
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import padding
+from django.contrib.auth.hashers import make_password
+import re
+
+
+from pymongo import MongoClient
+import gridfs
+from bson import ObjectId
+
+# Custom imports
+from .db import *  # Import the MongoDB connection
+from .utils import *
+
+
+
+logger = logging.getLogger(__name__)
+
+
+# Create your views here.
+def home(request):
+    return render(request, 'evidence/index.html')
+
+# def login_view(request):
+#     if request.method == 'POST':
+#         # Bypass authentication for testing purposes
+#         return redirect('dashboard')  # Directly redirect to the dashboard page
+    
+#     return render(request, 'evidence/login.html')
+
+
+
+# def login_view(request):
+#     if request.method == 'POST':
+#         email = request.POST.get('email')
+#         password = request.POST.get('password')
+        
+#         user = users_collection.find_one({"email": email})
+        
+#         if user:
+#             # Check if the password matches (you might want to hash the password before comparing)
+#             if user['password'] == password:
+#                 # Login success, redirect to dashboard
+#                 return redirect('dashboard')
+#             else:
+#                 # Incorrect password
+#                 messages.error(request, 'Invalid password')
+#         else:
+#             # User not found
+#             messages.error(request, 'No user found with this email')
+        
+#         return redirect('login')  # Redirect back to login page if authentication fails
+
+#     return render(request, 'evidence/login.html')
+import logging
+
+# Set up logging
+logger = logging.getLogger(__name__)
+
+
+from bson import ObjectId
+
+from django.contrib.auth.hashers import check_password
+def login_view(request):
+    if request.method == 'POST':
+        # Get the email and password from the POST request
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+
+        # Query MongoDB for the user
+        user = users_collection.find_one({'email': email})
+
+        if user and check_password(password, user['password']):
+            # Password matches, log in the user
+            # Convert ObjectId to string before saving in the session
+            request.session['user_id'] = str(user['_id'])
+            return redirect('dashboard')
+        else:
+            # Handle invalid login
+            return render(request, 'evidence/login.html', {'error': 'Invalid email or password'})
+
+    return render(request, 'evidence/login.html')
+
+
+
+
+# View for the signup page
+def signup_view(request):
+    if request.method == 'POST':
+        # Extract data from the form
+        name = request.POST.get('name')
+        role = request.POST.get('role')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        contact_number = request.POST.get('contact_number', None)
+        department = request.POST.get('department')
+        badge_number = request.POST.get('badge_number')
+
+        # Validate required fields
+        if not all([name, role, email, password, department, badge_number]):
+            messages.error(request, 'Please fill in all required fields.')
+            return render(request, 'evidence/signup.html', request.POST)
+
+        # Email validation
+        email_regex = r'^[\w\.-]+@[\w\.-]+\.\w+$'
+        if not re.match(email_regex, email):
+            messages.error(request, 'Invalid email address.')
+            return render(request, 'evidence/signup.html', request.POST)
+
+        # Check if the user already exists
+        if users_collection.find_one({'email': email}):
+            messages.error(request, 'An account with this email already exists.')
+            return render(request, 'evidence/signup.html', request.POST)
+
+        # Hash the password
+        hashed_password = make_password(password)
+
+        # Create the user object
+        user_data = {
+            'name': name,
+            'role': role,
+            'email': email,
+            'password': hashed_password,
+            'contact_number': contact_number,
+            'department': department,
+            'badge_number': badge_number,
+            'created_at': datetime.now()
+        }
+
+        # Insert the user into the MongoDB collection
+        try:
+            users_collection.insert_one(user_data)
+            messages.success(request, 'Account created successfully. You can log in now!')
+            return redirect('login')  # Redirect to login page
+        except Exception as e:
+            messages.error(request, f'Error creating account: {str(e)}')
+            return render(request, 'evidence/signup.html', request.POST)
+
+    return render(request, 'evidence/signup.html')
+# View for logging out the user
+def logout_view(request):
+    logout(request)
+    return redirect('home')  # Redirect to the login page after logout
+
+
+def dashboard(request):
+    # Get the user_id from the session
+    user_id = request.session.get('user_id')
+
+    if not user_id:
+        return redirect('login')  # Redirect if the user is not logged in
+
+    try:
+        # Convert user_id back to ObjectId to query MongoDB
+        user_data = users_collection.find_one({'_id': ObjectId(user_id)})
+    except Exception as e:
+        print(f"Error fetching user data: {e}")
+        return redirect('login')
+    
+    total_cases = cases_collection.count_documents({})
+    under_investigation_cases = cases_collection.count_documents({'case_status': encrypt_content('Under Investigation')})
+    closed_cases = cases_collection.count_documents({'case_status': encrypt_content('Closed')})
+
+    # Pass user_data to the template
+    context = {
+        'user_data': user_data,
+        'total_cases': total_cases,
+         'under_investigation_cases': under_investigation_cases,
+         'closed_cases': closed_cases,
+    }
+    return render(request, 'evidence/dashboard.html', context)
+
+
+def cases(request):
+    # You can pass any context data related to cases here if needed
+    return render(request, 'evidence/cases.html')
+
+# Evidence Management View
+def evidence(request):
+    # You can pass any context data related to cases here if needed
+    return render(request, 'evidence/evidence.html')
+
+
+
+
+fs = gridfs.GridFS(db)
+
+# Encryption and Decryption functions
+def get_cipher():
+    key = settings.ENCRYPTION_KEY  # Already in bytes
+    iv = settings.ENCRYPTION_IV  # Already in bytes
+    cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
+    return cipher
+
+def encrypt_content(plain_text):
+    cipher = get_cipher()
+    encryptor = cipher.encryptor()
+    padded_data = plain_text + (16 - len(plain_text) % 16) * ' '
+    encrypted_data = encryptor.update(padded_data.encode('utf-8')) + encryptor.finalize()
+    return base64.b64encode(encrypted_data).decode('utf-8')
+
+def decrypt_content(encrypted_text):
+    cipher = get_cipher()
+    decryptor = cipher.decryptor()
+    encrypted_data = base64.b64decode(encrypted_text)
+    decrypted_data = decryptor.update(encrypted_data) + decryptor.finalize()
+    return decrypted_data.decode('utf-8').rstrip()  # Remove padding
+
+
+def add_case(request):
+    if request.method == 'POST':
+        try:
+            # Capture form data
+            case_type = request.POST.get('case_type')
+            case_date = request.POST.get('case_date')
+            investigating_officer = request.POST.get('investigating_officer')
+            case_status = request.POST.get('case_status')
+            accused_names = request.POST.getlist('accused_names')  # Get multiple accused names
+            victim_names = request.POST.getlist('victim_names')  # Get multiple victim names
+            court_case_number = request.POST.get('court_case_number', '')
+            remarks = request.POST.get('remarks', '')
+            charges = request.POST.getlist('charges')  # Get multiple charges
+
+            # Validate required fields
+            if not case_type or not case_date or not investigating_officer or not case_status:
+                return JsonResponse({"error": "Missing required fields: case_type, case_date, investigating_officer, case_status"}, status=400)
+
+            # Convert case_date to datetime
+            try:
+                case_date = datetime.strptime(case_date, "%Y-%m-%d")
+            except ValueError:
+                return JsonResponse({"error": "Invalid date format. Use YYYY-MM-DD."}, status=400)
+
+            # Encrypt fields
+            encrypted_case_type = encrypt_content(case_type)
+            encrypted_case_date = encrypt_content(case_date.strftime("%Y-%m-%d"))  # Encrypt as string
+            encrypted_investigating_officer = encrypt_content(investigating_officer)
+            encrypted_case_status = encrypt_content(case_status)
+            encrypted_accused_names = [encrypt_content(name) for name in accused_names]
+            encrypted_victim_names = [encrypt_content(name) for name in victim_names]
+            encrypted_court_case_number = encrypt_content(court_case_number) if court_case_number else ''
+            encrypted_remarks = encrypt_content(remarks) if remarks else ''
+            encrypted_charges = [encrypt_content(charge) for charge in charges]
+
+            # Generate a new case_id as ObjectId
+            # case_id = ObjectId()  # This will create a valid ObjectId
+
+            # Prepare the new case data
+            new_case = {
+                # "case_id": case_id,  # case_id should be ObjectId
+                "case_type": encrypted_case_type,
+                "case_registration_date": encrypted_case_date,
+                "investigating_officer": encrypted_investigating_officer,
+                "case_status": encrypted_case_status,
+                "accused_names": encrypted_accused_names,  # Store as a list
+                "victim_names": encrypted_victim_names,  # Store as a list
+                "court_case_number": encrypted_court_case_number,
+                "remarks": encrypted_remarks,
+                "charges": encrypted_charges  # Store as a list
+            }
+
+            # Insert the encrypted case into MongoDB
+            cases_collection.insert_one(new_case)
+
+            # Redirect to the case list or show a success message
+            return redirect('cases')  # Or return a success message as you see fit
+
+        except Exception as e:
+            # Handle any errors and send back a response
+            return JsonResponse({"error": str(e)}, status=500)
+
+    # If method is GET, render the add_case form
+    return render(request, 'evidence/add_case.html')
+
+
+
+def case_detail(request, case_id):
+    try:
+        # Fetch the case details using ObjectId
+        case = cases_collection.find_one({"_id": ObjectId(case_id)})
+        
+        if not case:
+            return HttpResponse("Case not found", status=404)
+
+        # Decrypt the fields for display
+        case_detail = {
+            "id": str(case["_id"]),  # Convert ObjectId to string
+            "case_type": decrypt_content(case["case_type"]),
+            "case_registraion_date": decrypt_content(case["case_registration_date"]),  # Decrypt date as string
+            "investigating_officer": decrypt_content(case["investigating_officer"]),
+            "case_status": decrypt_content(case["case_status"]),
+            "accused_names": [decrypt_content(name) for name in case.get("accused_names", [])],  # Decrypt list
+            "victim_names": [decrypt_content(name) for name in case.get("victim_names", [])],  # Decrypt list
+            "court_case_number": decrypt_content(case.get("court_case_number", "")),
+            "remarks": decrypt_content(case.get("remarks", "")),
+            "charges": [decrypt_content(charge) for charge in case.get("charges", [])]  # Decrypt list
+        }
+
+        # Render the case detail template
+        return render(request, "evidence/case_detail.html", {"case": case_detail})
+
+    except Exception as e:
+        return HttpResponse(f"Error: {e}", status=400)
+
+
+def cases(request):
+    search_results = []
+
+    try:
+        # Get the search query from request
+        query = request.GET.get('query', '')
+
+        if query:
+            # Perform a search with decrypted field comparisons
+            # Fetch all cases from the database
+            all_cases = cases_collection.find()
+            
+            # Decrypt all cases and filter them based on the query
+            all_cases = [
+                {
+                    **case,
+                    "case_id": str(case["_id"]),
+                    "case_type": decrypt_content(case["case_type"]),
+                    "court_case_number" : decrypt_content(case["court_case_number"]),
+                    "accused_names": [decrypt_content(name) for name in case.get("accused_names", [])],
+                    "victim_names": [decrypt_content(name) for name in case.get("victim_names", [])]
+                }
+                for case in all_cases
+            ]
+
+            # Filter decrypted cases based on the query
+            search_results = [
+                case for case in all_cases if
+                query.lower() in case["case_type"].lower() or
+                query in case["court_case_number"] or
+                any(query.lower() in name.lower() for name in case["accused_names"]) or
+                any(query.lower() in name.lower() for name in case["victim_names"])
+            ]
+        else:
+            # If no query, fetch all cases and decrypt them
+            all_cases = cases_collection.find()
+            all_cases = [
+                {
+                    **case,
+                    "case_id": str(case["_id"]),
+                    "case_type": decrypt_content(case["case_type"]),
+                    "court_case_number" : decrypt_content(case["court_case_number"]),
+                    "accused_names": [decrypt_content(name) for name in case.get("accused_names", [])],
+                    "victim_names": [decrypt_content(name) for name in case.get("victim_names", [])],
+                    "case_status": [decrypt_content(case["case_status"])]
+                }
+                for case in all_cases
+            ]
+
+        # If no search query is provided, display all cases as search results
+        search_results = search_results or all_cases
+
+        # Render the cases list with all cases and search results
+        return render(request, 'evidence/cases.html', {'all_cases': all_cases, 'search_results': search_results})
+
+    except Exception as e:
+        # Handle any errors and log them
+        return HttpResponse(f"Error: {e}", status=500)
+
+
+
+
+SECRET_KEY = b'YourSecureKeyHere'  # 16 bytes for AES-128 (or 32 bytes for AES-256)
+
+
+
+# Helper function to get case by court case number
+def get_case_by_number(court_case_number):
+    return cases_collection.find_one({'court_case_number': encrypt_content(court_case_number)})
+
+# Helper function to get evidence by case ID
+def get_evidence_by_case_id(case_id):
+    return list(evidence_collection.find({'case_id': case_id}))
+
+
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import padding
+
+def encrypt_file(file_data):
+    # Encrypt the file content using the same key and IV from settings
+    cipher = Cipher(algorithms.AES(settings.ENCRYPTION_KEY), modes.CBC(settings.ENCRYPTION_IV), backend=default_backend())
+    encryptor = cipher.encryptor()
+
+    # Pad the file data
+    padder = padding.PKCS7(128).padder()
+    padded_data = padder.update(file_data) + padder.finalize()
+
+    encrypted_data = encryptor.update(padded_data) + encryptor.finalize()
+    return encrypted_data
+
 def add_evidence(request):
     if request.method == 'POST':
         court_case_number = request.POST.get('court_case_number')
         case = get_case_by_number(court_case_number)
+
+        # Check if case exists
+        if not case:
+            return redirect('add_evidence')  # Redirect back to the form
+
         case_id = case.get('_id')
         evidence_type = request.POST.get('evidence_type')
         evidence_description = request.POST.get('evidence_description')
@@ -1106,7 +1268,13 @@ def add_evidence(request):
         }
 
         # Insert evidence into the database
-        evidence_collection.insert_one(evidence)
+        try:
+            evidence_collection.insert_one(evidence)
+            messages.success(request, 'Evidence added successfully.')
+            return redirect('evidence')  # Redirect to the evidence management page or success page
+        except Exception as e:
+            logger.error(f"Error inserting evidence into database: {str(e)}")
+            return HttpResponse(f"Error inserting evidence into database: {str(e)}", status=500)
 
     return render(request, 'evidence/add_evidence.html')
 
@@ -1183,4 +1351,5 @@ def view_file(request, file_id):
         return HttpResponse("File not found", status=404)
     except Exception as e:
         return HttpResponse(f"Error retrieving file: {str(e)}", status=500)
+
 

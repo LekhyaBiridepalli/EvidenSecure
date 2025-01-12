@@ -1,10 +1,8 @@
-
-
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>EvidenSecure - Login</title>
+    <title>EvidenSecure - Sign Up</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">
@@ -30,26 +28,58 @@
 </head>
 <body>
     <div class="wrapper">
-      <form action="{% url 'signup' %}" method = "POST">
-        {% csrf_token %}
-        <h2>Sign Up</h2>
-        <div class="input-field">
-          <input type="text" required>
-          <label>Enter your name</label>
+        <form action="{% url 'signup' %}" method="POST">
+            {% csrf_token %}
+            <h2>Sign Up</h2>
+            
+            <!-- Full Name -->
+            <div class="input-field">
+                <input type="text" name="name" required>
+                <label>Full Name</label>
+            </div>
+            
+            <!-- Role -->
+            <div class="input-field">
+                <input type="text" name="role" required>
+                <label>Role</label>
+            </div>
+            
+            <!-- Email -->
+            <div class="input-field">
+                <input type="email" name="email" required>
+                <label>Email Address</label>
+            </div>
+            
+            <!-- Password -->
+            <div class="input-field">
+                <input type="password" name="password" required>
+                <label>Password</label>
+            </div>
+
+           <!-- Department -->
+           <div class="input-field">
+            <input type="text" name="contact_number" required>
+            <label>Contact Number</label>
         </div>
-        <div class="input-field">
-          <input type="text" required>
-          <label>Enter your email</label>
-        </div>
-        <div class="input-field">
-          <input type="password" required>
-          <label>Enter your password</label>
-        </div>
-        <button type="submit">Sign Up</button>
-        <div class="register">
-          <p>Already have an account? <a href="{% url 'login'%}">Login</a></p>
-        </div>
-      </form>
+            
+            <!-- Department -->
+            <div class="input-field">
+              <input type="text" name="department" required>
+              <label>Department</label>
+          </div>
+            
+            <!-- Badge Number -->
+            <div class="input-field">
+                <input type="text" name="badge_number" required>
+                <label>Badge Number</label>
+            </div>
+            
+            <button type="submit">Sign Up</button>
+            
+            <div class="register">
+                <p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
+            </div>
+        </form>
     </div>
-  </body>
-  </html>
+</body>
+</html>

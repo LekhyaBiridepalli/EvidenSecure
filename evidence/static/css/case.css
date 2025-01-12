@@ -126,31 +126,60 @@ section {
     color: #1dc8cd; /* Match the color scheme */
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    aside {
-        width: 100%;
-        position: relative;
-        box-shadow: none;
-    }
-
-    .container {
-        margin-left: 0;
-    }
-
-    footer {
-        width: 100%;
-        left: 0;
-    }
-
-    .row {
-        flex-direction: column; /* Stack cards vertically on small screens */
-    }
-
-    .card {
-        margin: 10px 0; /* Margin for vertical spacing */
-    }
+/* Floating Action Button */
+.fab-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    padding: 15px;
+    font-size: 24px;
+    background-color: #1dc8cd;
+    color: #fff;
+    border-radius: 50%;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    transition: background-color 0.3s;
 }
+
+.fab-btn:hover {
+    background-color: #16b5b2;
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.pagination a {
+    text-decoration: none;
+    padding: 10px 20px;
+    background-color: #1dc8cd;
+    color: #fff;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.pagination a:hover {
+    background-color: #16b5b2;
+}
+
+/* Case Status Badge */
+.badge {
+    padding: 5px 10px;
+    border-radius: 12px;
+}
+
+.bg-success {
+    background-color: #28a745;
+}
+
+.bg-warning {
+    background-color: #ffc107;
+}
+
 
 
 /* General Button Styles */

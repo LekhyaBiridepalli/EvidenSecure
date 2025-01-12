@@ -14,6 +14,7 @@ urlpatterns = [
     path('add_evidence/', views.add_evidence, name='add_evidence'),  # Accept case_number in URL
     path('view_file/<str:file_id>/', views.view_file, name='view_file'),
 
+
         
 
 ]
