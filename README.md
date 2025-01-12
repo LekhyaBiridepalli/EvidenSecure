@@ -59,7 +59,7 @@
 ### Step 1: Clone the Repository
 1. Clone the repository:  
    ```bash
-   git clone https://github.com/your-username/evidensecure.git
+   git clone https://github.com/ifrahnz26/evidensecure.git
 2. Navigate to the Project Directory
    ```bash
    cd evidensecure
