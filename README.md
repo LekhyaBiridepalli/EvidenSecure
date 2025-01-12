@@ -72,7 +72,7 @@
     ```bash
    pip freeze > requirements.txt
 
-###Step 3: Set Up the Database
+### Step 3: Set Up the Database
 1. Start MongoDB:
    ```bash
    mongod 
@@ -87,7 +87,7 @@
    ```bash
    mongoimport --db EvidenSecure_db --collection users --file sample-users.json
 
-###Step 4: Configure the Project
+### Step 4: Configure the Project
 1. Update database settings in settings.py:
    ```bash
    DATABASES = {
@@ -97,7 +97,7 @@
          }
    }
 
-###Step 5: Run the Application
+### Step 5: Run the Application
 1. Apply migrations:
    ```bash
    python manage.py migrate
@@ -109,18 +109,18 @@
 
 ---
 
-##Database Design
-###Collections
-####Users: Stores user information like name, email, and hashed passwords.
-####Evidence: Manages evidence files and associated metadata.
-####Cases: Tracks cases linked to evidence and investigators.
+## Database Design
+### Collections
+#### Users: Stores user information like name, email, and hashed passwords.
+#### Evidence: Manages evidence files and associated metadata.
+#### Cases: Tracks cases linked to evidence and investigators.
 
 ---
 
-##Technologies Used
-###Frontend: HTML, CSS, JavaScript
-###Backend: Django
-###Database: MongoDB
+## Technologies Used
+### Frontend: HTML, CSS, JavaScript
+### Backend: Django
+### Database: MongoDB
 ###Server: Django Development Server
 ###Tools: Python, GridFS
 
