@@ -64,7 +64,6 @@
    ```bash
    cd evidensecure
 
-
 ### Step 2: Install Required Dependencies
 1. Install all necessary dependencies using the requirements.txt file:
    ```bash
@@ -72,7 +71,6 @@
 2. If you don’t have the requirements.txt file, generate it:
     ```bash
    pip freeze > requirements.txt
-
 
 ###Step 3: Set Up the Database
 1. Start MongoDB:
@@ -89,7 +87,6 @@
    ```bash
    mongoimport --db EvidenSecure_db --collection users --file sample-users.json
 
-
 ###Step 4: Configure the Project
 1. Update database settings in settings.py:
    ```bash
@@ -99,7 +96,6 @@
                    'NAME': 'EvidenSecure_db',
          }
    }
-
 
 ###Step 5: Run the Application
 1. Apply migrations:
