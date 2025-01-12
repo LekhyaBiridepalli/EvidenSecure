@@ -77,24 +77,22 @@
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th>Evidence ID</th>
+                <th>Court Case Number</th>
                 <th>Type</th>
                 <th>Description</th>
                 <th>Collected By</th>
                 <th>Upload Date</th>
-                <th>Remarks</th>
                 <th>File</th>
             </tr>
         </thead>
         <tbody>
             {% for evidence in evidence_list %}
                 <tr>
-                    <td>{{ evidence.id }}</td>
+                    <td>{{ court_case_number }}</td>
                     <td>{{ evidence.evidence_type }}</td>
                     <td>{{ evidence.evidence_description }}</td>
                     <td>{{ evidence.collected_by }}</td>
                     <td>{{ evidence.upload_date }}</td>
-                    <td>{{ evidence.remarks }}</td>
                     <td>
                         {% if evidence.files %}
         {% for file in evidence.files %}

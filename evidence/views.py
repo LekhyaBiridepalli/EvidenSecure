@@ -1,9 +1,14 @@
+import hashlib
 from django.shortcuts import render
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from .db import *  # Import the MongoDB connection
+from .utils import *
+
+
+
 
 
 # Create your views here.
@@ -65,346 +70,9 @@ def evidence(request):
     # You can pass any context data related to cases here if needed
     return render(request, 'evidence/evidence.html')
 
-# def cases(request):
-#     query = request.GET.get('query', '')  # Get search query from URL parameters
-#     if query:
-#         # Search for cases by case_id or title
-#         search_results = cases_collection.find({
-#             '$or': [
-#                 {'case_id': {'$regex': query, '$options': 'i'}},
-#                 {'title': {'$regex': query, '$options': 'i'}}
-#             ]
-#         })
-#     else:
-#         search_results = []
-
-#     # Fetch all cases for the "All Cases" section
-#     all_cases = cases_collection.find()
-
-#     # Convert MongoDB cursors to lists
-#     search_results = list(search_results)
-#     all_cases = list(all_cases)
-
-#     return render(request, 'evidence/cases.html', {
-#         'search_results': search_results,
-#         'all_cases': all_cases
-#     })
-
-
-# # View to Add Case
-# def add_case(request):
-#     if request.method == 'POST':
-#         case_data = {
-#             "case_id": request.POST.get('case_id'),
-#             "title": request.POST.get('title'),
-#             "description": request.POST.get('description'),
-#             "officer_id": request.POST.get('officer_id'),
-#             "status": request.POST.get('status'),
-#         }
-#         cases_collection.insert_one(case_data)  # Save case in MongoDB
-#         return redirect('cases')  # Redirect to cases page
-#     return render(request, 'evidence/addcase.html')  # Render Add Case page
-
-# def case_detail(request, case_id):
-#     # Fetch the case details from MongoDB
-#     case = cases_collection.find_one({'case_id': case_id})
-#     if not case:
-#         return render(request, '404.html', status=404)  # Handle case not found
-
-#     return render(request, 'evidence/case_detail.html', {'case': case})
-
-# from django.shortcuts import render, get_object_or_404
-# from django.http import HttpResponse
-# from .db import cases_collection
-# from bson.objectid import ObjectId
-# from django.http import JsonResponse
-# from django.shortcuts import render
-# from pymongo import MongoClient
-
-# # # Set up MongoDB client
-# # client = MongoClient('mongodb://localhost:27017/')  # Make sure the MongoDB URI is correct
-# # db = client['EvidenSecure_db']  # Name of your database
-# # cases_collection = db['Cases']  # Your collection name
-
-# # def cases(request):
-# #     search_results = []
-    
-# #     # Check if there's a search query
-# #     query = request.GET.get('query', '')
-# #     if query:
-# #         search_results = list(cases_collection.find({
-# #             "$or": [
-# #                 {"case_type": {"$regex": query, "$options": "i"}},  # Case type search
-# #                 {"accused_name": {"$regex": query, "$options": "i"}},  # Accused name search
-# #                 {"victim_name": {"$regex": query, "$options": "i"}}  # Victim name search
-# #             ]
-# #         }))
-# #     else:
-# #         search_results = list(cases_collection.find())  # Fetch all cases if no search query
-    
-# #     context = {
-# #         'search_results': search_results
-# #     }
-    
-# #     return render(request, 'evidence/cases.html', context)
-
-
-# # def case_detail(request, case_id):
-# #     # Fetch the case details using ObjectId
-# #     case = cases_collection.find_one({"_id": ObjectId(case_id)})
-# #     if not case:
-# #         return HttpResponse("Case not found", status=404)
-    
-# #     case["id"] = str(case["_id"])
-# #     return render(request, "evidence/case_detail.html", {"case": case})
-
-# from bson import ObjectId
-# from django.shortcuts import render
-# from django.http import HttpResponse
-# from datetime import datetime
-
-# # def cases(request):
-# #     query = request.GET.get("query", "")  # Search query from the form (if any)
-
-# #     # Fetch search results if a query is provided
-# #     search_results = []
-# #     if query:
-# #         search_results = list(
-# #             cases_collection.find({
-# #                 "$or": [
-# #                     {"case_type": {"$regex": query, "$options": "i"}},
-# #                     {"accused_name": {"$regex": query, "$options": "i"}},
-# #                     {"victim_name": {"$regex": query, "$options": "i"}}
-# #                 ]
-# #             })
-# #         )
-# #         # Convert ObjectId to string for the template
-# #         for case in search_results:
-# #             case["id"] = str(case["_id"])
-# #     else:
-# #         # If no search query, get all cases
-# #         search_results = list(cases_collection.find())
-
-# #     # Fetch all cases for the "All Cases List" section (sorted by case date)
-# #     all_cases = list(cases_collection.find().sort("case_date", -1))
-# #     for case in all_cases:
-# #         case["id"] = str(case["_id"])  # Convert ObjectId to string for template
-
-# #     context = {
-# #         "search_results": search_results,
-# #         "all_cases": all_cases
-# #     }
-    
-# #     return render(request, "evidence/cases.html", context)
-
-# def cases(request):
-#     search_results = []
-    
-#     # If there is a query in the search input
-#     query = request.GET.get('query', '')
-    
-#     # If the search query exists, filter cases based on the query
-#     if query:
-#         search_results = cases_collection.find({
-#             "$or": [
-#                 {"case_type": {"$regex": query, "$options": "i"}},  # Search in case_type
-#                 {"accused_name": {"$regex": query, "$options": "i"}},  # Search in accused_name
-#                 {"victim_name": {"$regex": query, "$options": "i"}}  # Search in victim_name
-#             ]
-#         })
-#     else:
-#         # Fetch all cases if no search query is provided
-#         search_results = cases_collection.find()
-
-#     all_cases = cases_collection.find()
-#     all_cases = [{**case, "case_id": str(case["_id"])} for case in all_cases]
-#     search_results = [{**case, "case_id": str(case["_id"])} for case in search_results]
-
-
-#     return render(request, 'evidence/cases.html', { 'all_cases': all_cases,'search_results': search_results, })
-
-# # def case_detail(request, case_id):
-# #     # Fetch the case details using ObjectId
-# #     case = cases_collection.find_one({"_id": ObjectId(case_id)})
-# #     if not case:
-# #         return HttpResponse("Case not found", status=404)
-    
-# #     case["id"] = str(case["_id"])  # Convert ObjectId to string for template
-# #     return render(request, "evidence/case_detail.html", {"case": case})
-
-# def case_detail(request, case_id):
-#     # Fetch the case details using ObjectId
-#     try:
-#         case = cases_collection.find_one({"_id": ObjectId(case_id)})
-#     except Exception as e:
-#         return HttpResponse(f"Error: {e}", status=400)
-    
-#     if not case:
-#         return HttpResponse("Case not found", status=404)
-
-#     # Convert ObjectId to string for display
-#     case["id"] = str(case["_id"])
-#     case["case_date"] = case["case_date"].strftime('%Y-%m-%d')  # Format the date as string
-
-#     return render(request, "evidence/case_detail.html", {"case": case})
-
-# # def add_case(request):
-# #     if request.method == "POST":
-# #         case_data = {
-# #             "case_type": request.POST.get("case_type"),
-# #             "case_date": request.POST.get("case_date"),
-# #             "accused_name": request.POST.get("accused_name"),
-# #             "victim_name": request.POST.get("victim_name"),
-# #             "investigating_officer": request.POST.get("investigating_officer"),
-# #             "case_status": request.POST.get("case_status"),
-# #             "court_case_number": request.POST.get("court_case_number"),
-# #             "remarks": request.POST.get("remarks"),
-# #         }
-# #         cases_collection.insert_one(case_data)
-# #         return render(request, "evidence/cases.html")
-    
-# #     return render(request, "evidence/add_case.html")
-
-# # def add_case(request):
-# #     if request.method == 'POST':
-# #         # Get data from the request body (assuming the data is sent as form data or JSON)
-# #         case_data = request.POST
-        
-# #         # Create a new case dictionary that matches your schema
-# #         new_case = {
-# #             'case_id': case_data.get('case_id'),  # Assuming this is a unique identifier
-# #             'case_type': case_data.get('case_type'),  # Type of case, e.g., Murder
-# #             'case_date': datetime.strptime(case_data.get('case_date'), "%Y-%m-%d"),  # Parse date string
-# #             'accused_name': case_data.get('accused_name'),
-# #             'victim_name': case_data.get('victim_name'),
-# #             'investigating_officer': case_data.get('investigating_officer'),
-# #             'case_status': case_data.get('case_status'),
-# #             'court_case_number': case_data.get('court_case_number'),
-# #             'remarks': case_data.get('remarks')
-# #         }
-
-# #         # Insert the new case into the database
-# #         result = cases_collection.insert_one(new_case)
-
-# #         # Return a success response with the case ID
-# #         if result.inserted_id:
-# #             return JsonResponse({'message': 'Case added successfully!', 'case_id': str(result.inserted_id)}, status=201)
-# #         else:
-# #             return JsonResponse({'message': 'Failed to add case.'}, status=500)
-
-# #     # If it's not a POST request, render the case addition page
-# #     return render(request, 'evidence/add_case.html')
-
-# # In your views.py
-# from django.http import JsonResponse
-# from django.views.decorators.csrf import csrf_exempt
-# from datetime import datetime
-# import json
-# from bson import ObjectId
-# from datetime import datetime
-# import json
-
-# # @csrf_exempt
-# # def add_case(request):
-# #     if request.method == 'POST':
-# #         try:
-# #             # Log the raw request body for debugging
-# #             print("Raw Request Body:", request.body)
-
-# #             case_data = json.loads(request.body)
-
-# #             # Convert case_id to ObjectId if needed
-# #             case_id = ObjectId()  # Automatically generates a unique ObjectId if case_id is not provided
-# #             if 'case_id' in case_data:
-# #                 case_id = ObjectId(case_data.get('case_id'))  # If you are sending case_id as a string, convert it to ObjectId
-
-# #             # Parse the case_date if it's present
-# #             case_date = datetime.strptime(case_data.get('case_date'), "%Y-%m-%d") if 'case_date' in case_data else None
-
-# #             # Create the new case dictionary to insert into MongoDB
-# #             new_case = {
-# #                 "case_id": case_id,
-# #                 "case_type": case_data.get('case_type'),
-# #                 "case_date": case_date,
-# #                 "investigating_officer": case_data.get('investigating_officer'),
-# #                 "case_status": case_data.get('case_status'),
-# #                 "accused_name": case_data.get('accused_name', ''),
-# #                 "victim_name": case_data.get('victim_name', ''),
-# #                 "court_case_number": case_data.get('court_case_number', ''),
-# #                 "remarks": case_data.get('remarks', '')
-# #             }
-
-# #             # Insert the case into the MongoDB collection
-# #             result = cases_collection.insert_one(new_case)  # Insert into MongoDB
-
-# #             return JsonResponse({"message": "Case added successfully!", "case_id": str(result.inserted_id)}, status=201)
-
-# #         except json.JSONDecodeError as e:
-# #             return JsonResponse({"error": f"Invalid JSON data: {str(e)}"}, status=400)
-# #         except Exception as e:
-# #             return JsonResponse({"error": str(e)}, status=500)
-
-# #     return JsonResponse({"error": "Only POST method allowed"}, status=405)
-
-# from bson import ObjectId
-# from datetime import datetime
-# from django.shortcuts import render, redirect
-# from django.http import JsonResponse
-# import json
-# def add_case(request):
-#     if request.method == 'POST':
-#         try:
-#             # Capture form data
-#             case_type = request.POST.get('case_type')
-#             case_date = request.POST.get('case_date')
-#             investigating_officer = request.POST.get('investigating_officer')
-#             case_status = request.POST.get('case_status')
-#             accused_name = request.POST.get('accused_name', '')
-#             victim_name = request.POST.get('victim_name', '')
-#             court_case_number = request.POST.get('court_case_number', '')
-#             remarks = request.POST.get('remarks', '')
-
-#             # Validate required fields
-#             if not case_type or not case_date or not investigating_officer or not case_status:
-#                 return JsonResponse({"error": "Missing required fields: case_type, case_date, investigating_officer, case_status"}, status=400)
-
-#             # Convert case_date to datetime
-#             try:
-#                 case_date = datetime.strptime(case_date, "%Y-%m-%d")
-#             except ValueError:
-#                 return JsonResponse({"error": "Invalid date format. Use YYYY-MM-DD."}, status=400)
-
-#             # Generate a new case_id as ObjectId
-#             case_id = ObjectId()  # This will create a valid ObjectId
-
-#             # Prepare the new case data
-#             new_case = {
-#                 "case_id": case_id,  # case_id should be ObjectId
-#                 "case_type": case_type,
-#                 "case_date": case_date,
-#                 "investigating_officer": investigating_officer,
-#                 "case_status": case_status,
-#                 "accused_name": accused_name,
-#                 "victim_name": victim_name,
-#                 "court_case_number": court_case_number,
-#                 "remarks": remarks
-#             }
-
-#             # Insert the case into MongoDB
-#             result = cases_collection.insert_one(new_case)
-
-#             # Redirect to the case list or show a success message
-#             return redirect('cases')  # Or return a success message as you see fit
-
-#         except Exception as e:
-#             # Handle any errors and send back a response
-#             return JsonResponse({"error": str(e)}, status=500)
-
-#     # If method is GET, render the add_case form
-#     return render(request, 'evidence/add_case.html')
 
 from bson import ObjectId
-from datetime import datetime
+from datetime import datetime, timezone
 from django.shortcuts import render, redirect
 from django.http import JsonResponse, HttpResponse
 import json
@@ -508,51 +176,6 @@ def cases(request):
     return render(request, 'evidence/cases.html', { 'all_cases': all_cases,'search_results': search_results })
 
 
-# def get_case_evidence(request, case_id):
-#     # Fetch evidence for the case from MongoDB
-#     evidence_list = evidence_collection.find({"case_id": ObjectId(case_id)})
-
-#     # Convert MongoDB documents to JSON-friendly format
-#     evidence_data = [{
-#         'evidence_id': str(evidence['_id']),
-#         'evidence_type': evidence['evidence_type'],
-#         'collected_by': evidence['collected_by'],
-#         'upload_date': evidence['upload_date']
-#     } for evidence in evidence_list]
-
-#     return JsonResponse({'evidences': evidence_data})
-
-
-# def add_evidence(request):
-#     case_id = request.GET.get('case_id')
-    
-#     if request.method == 'POST':
-#         # Process the form data to insert evidence into the MongoDB database
-#         evidence_type = request.POST.get('evidence_type')
-#         evidence_description = request.POST.get('evidence_description')
-#         evidence_file = request.FILES.get('evidence_file')
-
-#         # For simplicity, let's assume evidence is stored in the filesystem and the path is saved
-#         # If you're saving to GridFS or another system, adjust accordingly
-#         evidence_file_path = 'path_to_file'  # Save or store the file path
-
-#         evidence_data = {
-#             'case_id': ObjectId(case_id),  # Link evidence to case by ID
-#             'evidence_type': evidence_type,
-#             'evidence_description': evidence_description,
-#             'evidence_file': evidence_file_path,
-#             'upload_date': '2025-01-05',  # Use current date or datetime
-#             'collected_by': 'Inspector Name'  # You can retrieve this dynamically
-#         }
-
-#         # Insert evidence into MongoDB collection
-#         evidence_collection.insert_one(evidence_data)
-
-#         return redirect(f'/evidence/?case_id={case_id}')
-
-#     # If GET request, show the form for adding evidence
-#     return render(request, 'add_evidence.html', {'case_id': case_id})
-
 from django.shortcuts import render, redirect
 from django.conf import settings
 from pymongo import MongoClient
@@ -563,36 +186,929 @@ import os
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
 
-
-
-
-# Evidence View (Search evidence by case number and display it)
 # def evidence_view(request):
-#     case_number = request.GET.get('case_number', '')  # Case number from user input
-#     evidence_list = []
-#     error_message = ""
+#     # Get the court_case_number from GET request
+#     court_case_number = request.GET.get('court_case_number', '')
 
-#     if case_number:
-#         case = cases_collection.find_one({"case_number": case_number})  # Search case by case number
-#         if case:
-#             case_id = case['_id']
-#             evidence_list = list(evidence_collection.find({"case_id": ObjectId(case_id)}))
-
-#             # Add file URLs for GridFS files
-#             for evidence in evidence_list:
-#                 if 'files' in evidence and len(evidence['files']) > 0:
-#                     file_id = evidence['files'][0]['file_id']
-#                     file_data = fs.get(file_id)
-#                     evidence['file_url'] = f"/media/{file_id}"
-#         else:
-#             error_message = f"Case with number {case_number} not found."
-
+#     # Get the case from the database using the court_case_number
+#     case = get_case_by_number(court_case_number)
+    
+#     if case:
+#         # If the case exists, find the evidence linked to this case
+#         evidence_list = get_evidence_by_case_id(case['_id'])
+#     else:
+#         evidence_list = []
+    
 #     return render(request, 'evidence/evidence.html', {
-#         'case_number': case_number,
-#         'evidence_list': evidence_list,
-#         'error_message': error_message
+#         'court_case_number': court_case_number,  # Pass court_case_number to the template
+#         'evidence_list': evidence_list,  # Pass the evidence list to the template
 #     })
-# views.py
+
+# from django.core.files.storage import FileSystemStorage
+# from django.utils import timezone
+
+
+# from django.shortcuts import render, redirect
+# from django.http import HttpResponse
+# from pymongo import MongoClient
+# import gridfs
+# from django.utils import timezone
+
+# fs = gridfs.GridFS(db)
+
+
+
+import logging
+# # # Initialize logger
+logger = logging.getLogger(__name__)
+
+# # def add_evidence(request):
+# #     if request.method == 'POST':
+# #         # Get the court case number input from the form
+# #         court_case_number = request.POST.get('court_case_number')
+
+# #         # Retrieve the case object by case number
+# #         case = get_case_by_number(court_case_number)
+        
+# #         if case:
+# #             # Extract case_id from the case object
+# #             case_id = case.get('_id')  # or 'id' depending on your MongoDB setup
+
+# #             # Now extract other form data
+# #             evidence_type = request.POST.get('evidence_type')
+# #             evidence_description = request.POST.get('evidence_description')
+# #             collected_by = request.POST.get('collected_by')
+# #             remarks = request.POST.get('remarks', '')  # Optional field
+# #             upload_date = timezone.now()  # Use current timestamp for upload date
+
+# #             # Handle file upload
+# #             print(request.FILES.get('file'))
+
+# #             uploaded_file = request.FILES.get('file')
+
+# # # Debugging: Check if the file object is retrieved
+# #             if uploaded_file:
+# #                 print(f"File Name: {uploaded_file.name}")
+# #                 print(f"File Size: {uploaded_file.size} bytes")
+# #                 print(f"File Type: {uploaded_file.content_type}")
+# #             else:
+# #                 print("No file uploaded.")
+
+
+# #             if uploaded_file:
+# #                 try:
+# #                     # Save the file to GridFS
+# #                     # Save the file to GridFS
+# #                     file_id = fs.put(uploaded_file.read(), filename=uploaded_file.name, content_type=uploaded_file.content_type)
+
+# #                     print(f"File saved with ID: {file_id}")
+
+# #                     file_type = uploaded_file.content_type  # Extract file type (e.g., image/jpeg)
+# #                     file_name = uploaded_file.name  # Original file name
+# #                     file_size = uploaded_file.size  # File size in bytes
+
+# #                     # Log the file upload info
+# #                     logger.info(f"File uploaded: {file_name}, file_id: {file_id}")
+
+# #                     # Construct the files array as required by the schema
+# #                     files = [{
+# #                         'file_id': file_id,
+# #                         'file_type': file_type,
+# #                         'file_name': file_name,
+# #                         'file_size': file_size
+# #                     }]
+# #                 except Exception as e:
+# #                     logger.error(f"Error saving file: {str(e)}")
+# #                     return HttpResponse(f"Error saving file: {str(e)}", status=500)
+# #             else:
+# #                 files = [] 
+# #                 print("No file uploaded") # No file uploaded
+
+# #             # Create the evidence document to be inserted into MongoDB
+# #             new_evidence = {
+# #                 'case_id': case_id,
+# #                 'evidence_type': evidence_type,
+# #                 'evidence_description': evidence_description,
+# #                 'collected_by': collected_by,
+# #                 'upload_date': upload_date,
+# #                 'remarks': remarks,
+# #                 'files': files  # Reference to files in GridFS
+# #             }
+
+# #             # Insert the document into the evidence collection
+# #             try:
+# #                 evidence_collection.insert_one(new_evidence)
+# #                 return redirect('evidence')  # Redirect to the evidence management page or success page
+# #             except Exception as e:
+# #                 logger.error(f"Error inserting evidence into database: {str(e)}")
+# #                 return HttpResponse(f"Error inserting evidence into database: {str(e)}", status=500)
+
+# #         else:
+# #             # Case not found
+# #             logger.warning(f"Case not found for court case number: {court_case_number}")
+# #             return HttpResponse("Case not found", status=404)
+
+# #     return render(request, 'evidence/add_evidence.html')
+
+# from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+# from cryptography.hazmat.backends import default_backend
+# import os
+# from base64 import b64encode
+
+# # Key and IV should ideally be stored securely, not hard-coded.
+# key = os.urandom(32)  # 256-bit key for AES
+# iv = os.urandom(16)   # 128-bit IV
+
+# def encrypt_data(data):
+#     # Pad the data to make it a multiple of block size
+#     padder = padding.PKCS7(algorithms.AES.block_size).padder()
+#     padded_data = padder.update(data.encode()) + padder.finalize()
+
+#     # Encrypt the padded data
+#     cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
+#     encryptor = cipher.encryptor()
+#     encrypted_data = encryptor.update(padded_data) + encryptor.finalize()
+
+#     # Return encrypted data in base64 encoding for storage in MongoDB
+#     return b64encode(encrypted_data).decode()
+
+# def add_evidence(request):
+#     if request.method == 'POST':
+#         # Get the court case number input from the form
+#         court_case_number = request.POST.get('court_case_number')
+
+#         # Retrieve the case object by case number
+#         case = get_case_by_number(court_case_number)
+        
+#         if case:
+#             # Extract case_id from the case object
+#             case_id = case.get('_id')
+
+#             # Extract other form data
+#             evidence_type = request.POST.get('evidence_type')
+#             evidence_description = request.POST.get('evidence_description')
+#             collected_by = request.POST.get('collected_by')
+#             remarks = request.POST.get('remarks', '')  # Optional field
+#             upload_date = timezone.now()  # Use current timestamp for upload date
+
+#             # Encrypt the evidence description
+#             encrypted_description = encrypt_data(evidence_description)
+
+#             # Handle file upload
+#             uploaded_file = request.FILES.get('file')
+
+#             if uploaded_file:
+#                 try:
+#                     # Save the file to GridFS
+#                     file_id = fs.put(uploaded_file.read(), filename=uploaded_file.name, content_type=uploaded_file.content_type)
+
+#                     file_type = uploaded_file.content_type
+#                     file_name = uploaded_file.name
+#                     file_size = uploaded_file.size
+
+#                     # Construct the files array as required by the schema
+#                     files = [{
+#                         'file_id': file_id,
+#                         'file_type': file_type,
+#                         'file_name': file_name,
+#                         'file_size': file_size
+#                     }]
+#                 except Exception as e:
+#                     return HttpResponse(f"Error saving file: {str(e)}", status=500)
+#             else:
+#                 files = [] 
+
+#             # Create the evidence document to be inserted into MongoDB
+#             new_evidence = {
+#                 'case_id': case_id,
+#                 'evidence_type': evidence_type,
+#                 'evidence_description': encrypted_description,  # Store encrypted description
+#                 'collected_by': collected_by,
+#                 'upload_date': upload_date,
+#                 'remarks': remarks,
+#                 'files': files
+#             }
+
+#             try:
+#                 evidence_collection.insert_one(new_evidence)
+#                 return redirect('evidence')  # Redirect to the evidence management page or success page
+#             except Exception as e:
+#                 return HttpResponse(f"Error inserting evidence into database: {str(e)}", status=500)
+
+#         else:
+#             return HttpResponse("Case not found", status=404)
+
+#     return render(request, 'evidence/add_evidence.html')
+
+
+# from bson import ObjectId
+
+
+    
+
+# def view_file(request, file_id):
+#     try:
+#         if isinstance(file_id, str):
+#              file_id = ObjectId(file_id)
+#         # Ensure file_id is being correctly parsed
+#         print(f"Retrieving file with ID: {file_id}")
+        
+        
+#         # Try to get the file from GridFS using the file_id
+#         file = fs.get(file_id)
+#         print(f"File retrieved: {file.filename}")
+#         print(f"File Type: {file.content_type}")
+
+        
+#         response = HttpResponse(file, content_type=file.content_type)
+        
+#         # Handle file types for displaying in the browser
+#         if file.content_type.startswith('image'):
+#             response['Content-Type'] = file.content_type
+#         elif file.content_type == 'application/pdf':
+#             response['Content-Type'] = 'application/pdf'
+#         elif file.content_type == 'text/plain':
+#             response['Content-Type'] = 'text/plain'  # Handle plain text
+#         else:
+#             response['Content-Type'] = 'application/octet-stream'  # For generic files
+#         CHUNK_SIZE = 8192  # 8 KB chunks
+#         with file as f:
+#             for chunk in iter(lambda: f.read(CHUNK_SIZE), b''):
+#                 response.write(chunk)
+        
+#         return response
+    
+#     except gridfs.errors.NoFile:
+#         print(f"File with ID {file_id} not found.")
+#         return HttpResponse("File not found", status=404)
+
+# def decrypt_data(encrypted_data):
+#     # Decode the base64 encoded encrypted data
+#     encrypted_data = b64decode(encrypted_data)
+
+#     # Decrypt the data
+#     cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
+#     decryptor = cipher.decryptor()
+#     decrypted_data = decryptor.update(encrypted_data) + decryptor.finalize()
+
+#     # Unpad the decrypted data
+#     unpadder = padding.PKCS7(algorithms.AES.block_size).unpadder()
+#     unpadded_data = unpadder.update(decrypted_data) + unpadder.finalize()
+
+#     # Return decrypted data as a string
+#     return unpadded_data.decode()
+
+# def view_file(request, file_id):
+#     try:
+#         if isinstance(file_id, str):
+#              file_id = ObjectId(file_id)
+
+#         # Retrieve the file from GridFS
+#         file = fs.get(file_id)
+
+#         # If you have an encrypted file or document, decrypt it
+#         evidence_description = file.get('evidence_description', None)
+#         if evidence_description:
+#             decrypted_description = decrypt_data(evidence_description)
+#             file['evidence_description'] = decrypted_description
+
+#         response = HttpResponse(file, content_type=file.content_type)
+
+#         return response
+
+#     except gridfs.errors.NoFile:
+#         return HttpResponse("File not found", status=404)
+
+
+# from django.shortcuts import render, redirect
+# from django.http import JsonResponse
+# from django.core.files.storage import default_storage
+# from .utils import encrypt_data, encrypt_file, save_encrypted_evidence
+
+# # View for adding evidence
+# def add_evidence(request):
+#     if request.method == 'POST':
+#         case_id = request.POST['case_id']
+#         evidence_type = request.POST['evidence_type']
+#         evidence_description = request.POST['evidence_description']
+#         collected_by = request.POST['collected_by']
+        
+#         evidence_file = request.FILES['file'] if 'file' in request.FILES else None
+        
+#         # Encrypt the data
+#         encrypted_evidence_type = encrypt_data(evidence_type)
+#         encrypted_evidence_description = encrypt_data(evidence_description)
+#         encrypted_collected_by = encrypt_data(collected_by)
+
+#         if evidence_file:
+#             file_data = evidence_file.read()
+#             encrypted_file_data = encrypt_file(file_data)
+
+#             # Save the encrypted evidence and file to MongoDB and GridFS
+#             save_encrypted_evidence(
+#                 case_id=case_id,
+#                 evidence_type=encrypted_evidence_type,
+#                 evidence_description=encrypted_evidence_description,
+#                 collected_by=encrypted_collected_by,
+#                 file_data=encrypted_file_data,
+#                 file_name=evidence_file.name,
+#                 file_type=evidence_file.content_type
+#             )
+#             return JsonResponse({'status': 'success', 'message': 'Evidence added successfully'})
+
+#     return render(request, 'add_evidence.html')
+
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import padding
+from django.utils.crypto import get_random_string
+import base64
+from django.utils import timezone
+
+# Key for AES encryption (for demonstration, use a secure method to store/retrieve keys)
+SECRET_KEY = b'YourSecureKeyHere'  # 16 bytes for AES-128 (or 32 bytes for AES-256)
+
+# Function to encrypt content using AES encryption
+# def encrypt_content(content):
+#     # Create a random 16-byte IV for AES CBC mode
+#     iv = get_random_string(16).encode()
+#     cipher = Cipher(algorithms.AES(SECRET_KEY), modes.CBC(iv), backend=default_backend())
+#     padder = padding.PKCS7(128).padder()
+#     padded_data = padder.update(content.encode()) + padder.finalize()
+#     encryptor = cipher.encryptor()
+#     encrypted_content = encryptor.update(padded_data) + encryptor.finalize()
+#     return base64.b64encode(iv + encrypted_content).decode()  # Store iv and encrypted content as base64
+
+# Function to decrypt content using AES decryption
+# def decrypt_content(encrypted_content):
+#     # Decode the base64 content
+#     encrypted_content = base64.b64decode(encrypted_content)
+#     iv = encrypted_content[:16]  # Extract the IV
+#     encrypted_data = encrypted_content[16:]  # Extract the encrypted data
+
+#     cipher = Cipher(algorithms.AES(SECRET_KEY), modes.CBC(iv), backend=default_backend())
+#     decryptor = cipher.decryptor()
+#     decrypted_padded_data = decryptor.update(encrypted_data) + decryptor.finalize()
+#     unpadder = padding.PKCS7(128).unpadder()
+#     decrypted_content = unpadder.update(decrypted_padded_data) + unpadder.finalize()
+#     return decrypted_content.decode()
+
+# Modify the add_evidence view to encrypt content before saving
+# def add_evidence(request):
+#     if request.method == 'POST':
+#         court_case_number = request.POST.get('court_case_number')
+#         case = get_case_by_number(court_case_number)
+        
+#         if case:
+#             case_id = case.get('_id')
+
+#             # Extract form data
+#             evidence_type = encrypt_content(request.POST.get('evidence_type', ''))
+#             evidence_description = encrypt_content(request.POST.get('evidence_description', ''))
+#             collected_by = encrypt_content(request.POST.get('collected_by', ''))
+#             remarks = encrypt_content(request.POST.get('remarks', ''))
+#             upload_date = timezone.now()
+
+#             # Handle file upload
+#             uploaded_file = request.FILES.get('file')
+#             files = []
+
+#             if uploaded_file:
+#                 try:
+#                     file_id = fs.put(uploaded_file.read(), filename=uploaded_file.name, content_type=uploaded_file.content_type)
+#                     file_type = uploaded_file.content_type
+#                     file_name = uploaded_file.name
+#                     file_size = uploaded_file.size
+
+#                     # Encrypt the file content
+#                     encrypted_file = encrypt_content(uploaded_file.read().decode('utf-8'))
+
+#                     files = [{
+#                         'file_id': file_id,
+#                         'file_type': file_type,
+#                         'file_name': file_name,
+#                         'file_size': file_size,
+#                         'encrypted_file': encrypted_file  # Store the encrypted file content
+#                     }]
+#                 except Exception as e:
+#                     logger.error(f"Error saving file: {str(e)}")
+#                     return HttpResponse(f"Error saving file: {str(e)}", status=500)
+
+#             # Prepare the evidence document
+#             new_evidence = {
+#                 'case_id': case_id,
+#                 'evidence_type': evidence_type,
+#                 'evidence_description': evidence_description,
+#                 'collected_by': collected_by,
+#                 'upload_date': upload_date,
+#                 'remarks': remarks,
+#                 'files': files
+#             }
+
+#             # Insert evidence into MongoDB
+#             try:
+#                 evidence_collection.insert_one(new_evidence)
+#                 return redirect('evidence')
+#             except Exception as e:
+#                 logger.error(f"Error inserting evidence: {str(e)}")
+#                 return HttpResponse(f"Error inserting evidence: {str(e)}", status=500)
+#         else:
+#             return HttpResponse("Case not found", status=404)
+
+#     return render(request, 'evidence/add_evidence.html')
+
+# def add_evidence(request):
+#     if request.method == 'POST':
+#         court_case_number = request.POST.get('court_case_number')
+#         case = get_case_by_number(court_case_number)
+
+#         if case:
+#             case_id = case.get('_id')
+
+#             # Extract and encrypt form data
+#             evidence_type = encrypt_content(request.POST.get('evidence_type', ''))
+#             evidence_description = encrypt_content(request.POST.get('evidence_description', ''))
+#             collected_by = encrypt_content(request.POST.get('collected_by', ''))
+#             remarks = encrypt_content(request.POST.get('remarks', ''))
+#             upload_date = timezone.now()
+
+#             # Handle file upload
+#             uploaded_file = request.FILES.get('file')
+#             files = []
+
+#             if uploaded_file:
+#                 try:
+#                     file_id = fs.put(uploaded_file.read(), filename=uploaded_file.name, content_type=uploaded_file.content_type)
+#                     file_type = uploaded_file.content_type
+#                     file_name = uploaded_file.name
+#                     file_size = uploaded_file.size
+
+#                     # Encrypt the file content
+#                     encrypted_file = encrypt_content(uploaded_file.read().decode('utf-8'))
+
+#                     files = [{
+#                         'file_id': file_id,
+#                         'file_type': file_type,
+#                         'file_name': file_name,
+#                         'file_size': file_size,
+#                         'encrypted_file': encrypted_file  # Store the encrypted file content
+#                     }]
+#                 except Exception as e:
+#                     logger.error(f"Error saving file: {str(e)}")
+#                     return HttpResponse(f"Error saving file: {str(e)}", status=500)
+
+#             # Prepare and insert evidence
+#             new_evidence = {
+#                 'case_id': case_id,
+#                 'evidence_type': evidence_type,
+#                 'evidence_description': evidence_description,
+#                 'collected_by': collected_by,
+#                 'upload_date': upload_date,
+#                 'remarks': remarks,
+#                 'files': files
+#             }
+
+#             try:
+#                 evidence_collection.insert_one(new_evidence)
+#                 return redirect('evidence')
+#             except Exception as e:
+#                 logger.error(f"Error inserting evidence: {str(e)}")
+#                 return HttpResponse(f"Error inserting evidence: {str(e)}", status=500)
+#         else:
+#             return HttpResponse("Case not found", status=404)
+
+#     return render(request, 'evidence/add_evidence.html')
+
+# # Modify the view for file retrieval to decrypt the content
+# def view_file(request, file_id):
+#     try:
+#         if isinstance(file_id, str):
+#             file_id = ObjectId(file_id)
+
+#         file = fs.get(file_id)
+
+#         # Decrypt the file content
+#         decrypted_content = decrypt_content(file.read().decode('utf-8'))
+        
+#         response = HttpResponse(decrypted_content, content_type=file.content_type)
+        
+#         if file.content_type.startswith('image'):
+#             response['Content-Type'] = file.content_type
+#         elif file.content_type == 'application/pdf':
+#             response['Content-Type'] = 'application/pdf'
+#         elif file.content_type == 'text/plain':
+#             response['Content-Type'] = 'text/plain'
+#         else:
+#             response['Content-Type'] = 'application/octet-stream'
+
+#         return response
+#     except gridfs.errors.NoFile:
+#         return HttpResponse("File not found", status=404)
+#     except Exception as e:
+#         return HttpResponse(f"Error retrieving file: {str(e)}", status=500)
+
+# def decrypt_data(encrypted_data):
+#     # Ensure the key is 256 bits (32 bytes)
+#     key = hashlib.sha256(settings.SECRET_KEY.encode()).digest()  # Hash the SECRET_KEY to get a 256-bit key
+#     iv = encrypted_data[:16]  # Assuming the IV is the first 16 bytes of the encrypted data
+#     cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
+#     decryptor = cipher.decryptor()
+#     decrypted_data = decryptor.update(encrypted_data[16:]) + decryptor.finalize()
+#     return decrypted_data.decode('utf-8')  # Returning as a string
+
+# # def evidence_view(request):
+# #     # Get the court_case_number from GET request
+# #     court_case_number = request.GET.get('court_case_number', '')
+
+# #     # Get the case from the database using the court_case_number
+# #     case = get_case_by_number(court_case_number)
+    
+# #     if case:
+# #         # If the case exists, find the evidence linked to this case
+# #         evidence_list = get_evidence_by_case_id(case['_id'])
+        
+# #         # Decrypt sensitive fields for each evidence
+# #         for evidence in evidence_list:
+# #             # Decrypt text fields
+# #             if 'evidence_description' in evidence:
+# #                 evidence['evidence_description'] = decrypt_data(evidence['evidence_description'])
+# #             if 'remarks' in evidence:
+# #                 evidence['remarks'] = decrypt_data(evidence['remarks'])
+            
+# #             # Decrypt files if necessary
+# #             if 'files' in evidence:
+# #                 for file in evidence['files']:
+# #                     # Fetch file from GridFS and decrypt the content
+# #                     file_id = file['file_id']
+# #                     file_data = fs.get(file_id).read()  # Retrieve file content from GridFS
+# #                     decrypted_file_data = decrypt_data(file_data)  # Decrypt the file data
+# #                     file['decrypted_content'] = decrypted_file_data  # Attach decrypted content to the file record
+
+# #     else:
+# #         evidence_list = []
+    
+# #     return render(request, 'evidence/evidence.html', {
+# #         'court_case_number': court_case_number,  # Pass court_case_number to the template
+# #         'evidence_list': evidence_list,  # Pass the evidence list to the template
+# #     })
+
+# def evidence_view(request):
+#     # Get the court_case_number from GET request
+#     court_case_number = request.GET.get('court_case_number', '')
+
+#     # Get the case from the database using the court_case_number
+#     case = get_case_by_number(court_case_number)
+    
+#     if case:
+#         # If the case exists, find the evidence linked to this case
+#         evidence_list = get_evidence_by_case_id(case['_id'])
+        
+#         # Decrypt sensitive fields for each evidence
+#         for evidence in evidence_list:
+#             # Decrypt text fields
+#             if 'evidence_description' in evidence:
+#                 evidence['evidence_description'] = decrypt_content(evidence['evidence_description'])
+#             if 'remarks' in evidence:
+#                 evidence['remarks'] = decrypt_content(evidence['remarks'])
+            
+#             # Decrypt files if necessary
+#             if 'files' in evidence:
+#                 for file in evidence['files']:
+#                     # Fetch file from GridFS and decrypt the content
+#                     file_id = file['file_id']
+#                     file_data = fs.get(file_id).read()  # Retrieve file content from GridFS
+#                     decrypted_file_data = decrypt_content(file_data)  # Decrypt the file data
+#                     file['decrypted_content'] = decrypted_file_data  # Attach decrypted content to the file record
+
+#     else:
+#         evidence_list = []
+    
+#     return render(request, 'evidence/evidence.html', {
+#         'court_case_number': court_case_number,  # Pass court_case_number to the template
+#         'evidence_list': evidence_list,  # Pass the evidence list to the template
+#     })
+
+
+# def get_case_by_number(court_case_number):
+#     case = cases_collection.find_one({'court_case_number': court_case_number})
+#     return case
+
+# def get_evidence_by_case_id(case_id):
+#     evidence_list = list(evidence_collection.find({'case_id': case_id}))
+#     return evidence_list
+
+# import hashlib
+# from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+# from cryptography.hazmat.backends import default_backend
+# from cryptography.hazmat.primitives import padding
+# from django.utils.crypto import get_random_string
+# import base64
+
+# # A helper function to ensure the SECRET_KEY is 256 bits (32 bytes)
+# def get_valid_key(key):
+#     return hashlib.sha256(key.encode()).digest()  # Hash to get a 32-byte key (256 bits)
+
+# # Modify the encrypt_content function
+# # def encrypt_content(content):
+# #     # Ensure the key is 256 bits (32 bytes)
+# #     key = get_valid_key('YourSecureKeyHere')  # Hash the key for AES
+
+# #     # Create a random 16-byte IV for AES CBC mode
+# #     iv = get_random_string(16).encode()
+# #     cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
+# #     padder = padding.PKCS7(128).padder()
+# #     padded_data = padder.update(content.encode()) + padder.finalize()
+# #     encryptor = cipher.encryptor()
+# #     encrypted_content = encryptor.update(padded_data) + encryptor.finalize()
+# #     return base64.b64encode(iv + encrypted_content).decode()  # Store iv and encrypted content as base64
+
+# # Modify the decrypt_content function
+# # def decrypt_content(encrypted_content):
+# #     # Ensure the key is 256 bits (32 bytes)
+# #     key = get_valid_key('YourSecureKeyHere')  # Hash the key for AES
+    
+# #     # Decode the base64 content
+# #     encrypted_content = base64.b64decode(encrypted_content)
+# #     iv = encrypted_content[:16]  # Extract the IV
+# #     encrypted_data = encrypted_content[16:]  # Extract the encrypted data
+
+# #     cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
+# #     decryptor = cipher.decryptor()
+# #     decrypted_padded_data = decryptor.update(encrypted_data) + decryptor.finalize()
+# #     unpadder = padding.PKCS7(128).unpadder()
+# #     decrypted_content = unpadder.update(decrypted_padded_data) + unpadder.finalize()
+# #     return decrypted_content.decode()
+
+
+# def encrypt_content(content):
+#     key = get_valid_key('YourSecureKeyHere')  # Example key, should be stored securely
+#     iv = os.urandom(16)  # Random IV for each encryption
+
+#     cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
+#     padder = padding.PKCS7(128).padder()
+#     padded_data = padder.update(content.encode()) + padder.finalize()
+
+#     encryptor = cipher.encryptor()
+#     encrypted_content = encryptor.update(padded_data) + encryptor.finalize()
+
+#     # Return IV + encrypted content as base64-encoded string
+#     return base64.b64encode(iv + encrypted_content).decode()
+# # Decrypt content using AES CBC mode
+# import base64
+# from cryptography.hazmat.backends import default_backend
+# from cryptography.hazmat.primitives import padding
+# from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+
+# def decrypt_content(encrypted_content):
+#     key = get_valid_key('YourSecureKeyHere')  # Securely retrieve the key
+
+#     # Decode the base64 encoded content (if it was base64 encoded during encryption)
+#     encrypted_content = base64.b64decode(encrypted_content)
+
+#     # Extract the IV (the first 16 bytes) and the encrypted data (the rest)
+#     iv = encrypted_content[:16]
+#     encrypted_data = encrypted_content[16:]
+
+#     # Initialize the AES cipher with CBC mode using the IV and key
+#     cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
+#     decryptor = cipher.decryptor()
+
+#     # Decrypt the data and get padded decrypted content
+#     decrypted_padded_data = decryptor.update(encrypted_data) + decryptor.finalize()
+
+#     # Unpad the decrypted content using PKCS7 unpadding
+#     unpadder = padding.PKCS7(128).unpadder()
+#     decrypted_content = unpadder.update(decrypted_padded_data) + unpadder.finalize()
+
+#     # Decode the decrypted content to return as a string (assuming it was originally a UTF-8 string)
+#     return decrypted_content.decode('utf-8')
+
+from django.shortcuts import render
+from django.http import HttpResponse
+from django.conf import settings
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.backends import default_backend
+from pymongo import MongoClient
+from bson import ObjectId
+import base64
+import gridfs
+import os
+from datetime import datetime
+
+
+fs = gridfs.GridFS(db)
+
+# Encryption and Decryption functions
+def get_cipher():
+    key = settings.ENCRYPTION_KEY  # Already in bytes
+    iv = settings.ENCRYPTION_IV  # Already in bytes
+    cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
+    return cipher
+
+def encrypt_content(plain_text):
+    cipher = get_cipher()
+    encryptor = cipher.encryptor()
+    padded_data = plain_text + (16 - len(plain_text) % 16) * ' '
+    encrypted_data = encryptor.update(padded_data.encode('utf-8')) + encryptor.finalize()
+    return base64.b64encode(encrypted_data).decode('utf-8')
+
+def decrypt_content(encrypted_text):
+    cipher = get_cipher()
+    decryptor = cipher.decryptor()
+    encrypted_data = base64.b64decode(encrypted_text)
+    decrypted_data = decryptor.update(encrypted_data) + decryptor.finalize()
+    return decrypted_data.decode('utf-8').rstrip()  # Remove padding
+
+# from cryptography.hazmat.primitives import padding
+# from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+# import base64
+
+# def decrypt_content(encrypted_text):
+#     """Decrypts the content using the encryption key and IV from settings."""
+#     # Decode the base64-encoded encrypted text
+#     encrypted_data = base64.b64decode(encrypted_text)
+
+#     # Get the cipher using the provided key and IV (settings should have these)
+#     cipher = get_cipher()
+#     decryptor = cipher.decryptor()
+
+#     # Decrypt the data
+#     decrypted_data = decryptor.update(encrypted_data) + decryptor.finalize()
+
+#     # Handle padding using PKCS7 and remove it
+#     unpadder = padding.PKCS7(128).unpadder()  # AES block size is 128 bits (16 bytes)
+#     unpadded_data = unpadder.update(decrypted_data) + unpadder.finalize()
+
+#     # Return the decrypted text as a string
+#     return unpadded_data.decode('utf-8')
+
+# Helper function to get case by court case number
+def get_case_by_number(court_case_number):
+    return cases_collection.find_one({'court_case_number': court_case_number})
+
+# Helper function to get evidence by case ID
+def get_evidence_by_case_id(case_id):
+    return list(evidence_collection.find({'case_id': case_id}))
+
+# Function to add evidence with encryption (WORKS)
+# def add_evidence(request):
+#     if request.method == 'POST':
+#         court_case_number = request.POST.get('court_case_number')
+#         case = get_case_by_number(court_case_number)
+#         case_id = case.get('_id')
+#         evidence_type = request.POST.get('evidence_type')
+#         evidence_description = request.POST.get('evidence_description')
+#         collected_by = request.POST.get('collected_by')
+        
+#         # Encrypt sensitive text fields
+#         evidence_type_encrypted = encrypt_content(evidence_type)
+#         evidence_description_encrypted = encrypt_content(evidence_description)
+#         collected_by_encrypted = encrypt_content(collected_by)
+
+#         # Handling file upload
+#         uploaded_file = request.FILES.get('file')
+#         file_data = uploaded_file.read()
+#         file_name = uploaded_file.name
+#         file_type = uploaded_file.content_type
+
+#         # Save the file to GridFS
+#         file_id = fs.put(file_data, filename=file_name, content_type=file_type)
+
+#         # Create evidence document
+#         evidence = {
+#             "case_id": ObjectId(case_id),
+#             "evidence_type": evidence_type_encrypted,
+#             "evidence_description": evidence_description_encrypted,
+#             "collected_by": collected_by_encrypted,
+#             "files": [
+#                 {
+#                     "file_id": file_id,
+#                     "file_type": file_type,
+#                     "file_name": file_name,
+#                     "file_size": len(file_data)
+#                 }
+#             ],
+#             "upload_date": datetime.now()
+#         }
+
+#         # Insert evidence into the database
+#         evidence_collection.insert_one(evidence)
+
+#         # return HttpResponse("Evidence added successfully", status=200)
+#     return render(request, 'evidence/add_evidence.html')
+
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import padding
+
+def encrypt_file(file_data):
+    # Encrypt the file content using the same key and IV from settings
+    cipher = Cipher(algorithms.AES(settings.ENCRYPTION_KEY), modes.CBC(settings.ENCRYPTION_IV), backend=default_backend())
+    encryptor = cipher.encryptor()
+
+    # Pad the file data
+    padder = padding.PKCS7(128).padder()
+    padded_data = padder.update(file_data) + padder.finalize()
+
+    encrypted_data = encryptor.update(padded_data) + encryptor.finalize()
+    return encrypted_data
+
+# def add_evidence(request):
+#     if request.method == 'POST':
+#         court_case_number = request.POST.get('court_case_number')
+#         case = get_case_by_number(court_case_number)
+#         case_id = case.get('_id')
+#         evidence_type = request.POST.get('evidence_type')
+#         evidence_description = request.POST.get('evidence_description')
+#         collected_by = request.POST.get('collected_by')
+
+#         # Encrypt sensitive text fields
+#         evidence_type_encrypted = encrypt_content(evidence_type)
+#         evidence_description_encrypted = encrypt_content(evidence_description)
+#         collected_by_encrypted = encrypt_content(collected_by)
+
+#         # Handling file upload
+#         uploaded_file = request.FILES.get('file')
+#         file_data = uploaded_file.read()
+#         file_name = uploaded_file.name
+#         file_type = uploaded_file.content_type
+
+#         # Encrypt the file content
+#         encrypted_file_data = encrypt_file(file_data)
+
+#         # Save the encrypted file to GridFS
+#         file_id = fs.put(encrypted_file_data, filename=file_name, content_type=file_type)
+
+#         # Create evidence document
+#         evidence = {
+#             "case_id": ObjectId(case_id),
+#             "evidence_type": evidence_type_encrypted,
+#             "evidence_description": evidence_description_encrypted,
+#             "collected_by": collected_by_encrypted,
+#             "files": [
+#                 {
+#                     "file_id": file_id,
+#                     "file_type": file_type,
+#                     "file_name": file_name,
+#                     "file_size": len(file_data)
+#                 }
+#             ],
+#             "upload_date": datetime.now()
+#         }
+
+#         # Insert evidence into the database
+#         evidence_collection.insert_one(evidence)
+
+#     return render(request, 'evidence/add_evidence.html')
+
+def add_evidence(request):
+    if request.method == 'POST':
+        court_case_number = request.POST.get('court_case_number')
+        case = get_case_by_number(court_case_number)
+        case_id = case.get('_id')
+        evidence_type = request.POST.get('evidence_type')
+        evidence_description = request.POST.get('evidence_description')
+        collected_by = request.POST.get('collected_by')
+
+        # Encrypt sensitive text fields
+        evidence_type_encrypted = encrypt_content(evidence_type)
+        evidence_description_encrypted = encrypt_content(evidence_description)
+        collected_by_encrypted = encrypt_content(collected_by)
+
+        # Handling file upload
+        uploaded_file = request.FILES.get('file')
+        file_data = uploaded_file.read()
+
+        # Encrypt the file data
+        encrypted_file_data = encrypt_file(file_data)
+        file_name_encrypted = encrypt_content(uploaded_file.name)  # Encrypt file name
+        file_type_encrypted = encrypt_content(uploaded_file.content_type)  # Encrypt file type
+        file_size_encrypted = encrypt_content(str(len(file_data)))  # Encrypt file size (converted to string)
+
+        # Save the encrypted file data to GridFS
+        file_id = fs.put(encrypted_file_data, filename=uploaded_file.name, content_type=uploaded_file.content_type)
+
+        # Create evidence document
+        evidence = {
+            "case_id": ObjectId(case_id),
+            "evidence_type": evidence_type_encrypted,
+            "evidence_description": evidence_description_encrypted,
+            "collected_by": collected_by_encrypted,
+            "files": [
+                {
+                    "file_id": file_id,
+                    "file_name": file_name_encrypted,
+                    "file_type": file_type_encrypted,
+                    "file_size": file_size_encrypted,
+                }
+            ],
+            "upload_date": datetime.now()
+        }
+
+        # Insert evidence into the database
+        evidence_collection.insert_one(evidence)
+
+    return render(request, 'evidence/add_evidence.html')
 
 
 def evidence_view(request):
@@ -605,379 +1121,66 @@ def evidence_view(request):
     if case:
         # If the case exists, find the evidence linked to this case
         evidence_list = get_evidence_by_case_id(case['_id'])
+        
+        # Decrypt the necessary fields in each evidence item
+        for evidence in evidence_list:
+            if evidence.get('evidence_type'):
+                evidence['evidence_type'] = decrypt_content(evidence['evidence_type'])
+            if evidence.get('evidence_description'):
+                evidence['evidence_description'] = decrypt_content(evidence['evidence_description'])
+            if evidence.get('collected_by'):
+                evidence['collected_by'] = decrypt_content(evidence['collected_by'])
+        
     else:
         evidence_list = []
-    
+
     return render(request, 'evidence/evidence.html', {
         'court_case_number': court_case_number,  # Pass court_case_number to the template
         'evidence_list': evidence_list,  # Pass the evidence list to the template
     })
 
-# # Add Evidence View (Insert new evidence into MongoDB)
-# def add_evidence_view(request):
-#     if request.method == 'POST':
-#         # Collect case number and verify it
-#         case_number = request.POST['case_number']
-#         case = cases_collection.find_one({"case_number": case_number})
 
-#         if not case:
-#             return render(request, 'evidence/add_evidence.html', {
-#                 'error_message': f"Case with number {case_number} not found.",
-#                 'case_number': case_number
-#             })
+def decrypt_file(encrypted_file_data):
+    cipher = Cipher(algorithms.AES(settings.ENCRYPTION_KEY), modes.CBC(settings.ENCRYPTION_IV), backend=default_backend())
+    decryptor = cipher.decryptor()
 
-#         # Case ID and evidence data preparation
-#         case_id = case['_id']
-#         evidence_data = {
-#             "case_id": ObjectId(case_id),
-#             "evidence_type": request.POST['evidence_type'],
-#             "evidence_description": request.POST['evidence_description'],
-#             "collected_by": request.POST['collected_by'],
-#             "upload_date": request.POST['upload_date'],
-#             "remarks": request.POST.get('remarks', ''),
-#         }
+    # Decrypt the file data
+    decrypted_data = decryptor.update(encrypted_file_data) + decryptor.finalize()
 
-#         # Handle file upload
-#         if 'file' in request.FILES:
-#             file = request.FILES['file']
-#             file_id = fs.put(file, filename=file.name, content_type=file.content_type)
-#             evidence_data['files'] = [{
-#                 "file_id": file_id,
-#                 "file_type": file.content_type,
-#                 "file_name": file.name,
-#             }]
+    # Unpad the decrypted data
+    unpadder = padding.PKCS7(128).unpadder()
+    unpadded_data = unpadder.update(decrypted_data) + unpadder.finalize()
 
-#         # Insert evidence into MongoDB
-#         evidence_collection.insert_one(evidence_data)
-#         return redirect('evidence')  # Redirect to the evidence page after adding evidence
+    return unpadded_data
 
-#     # Display Add Evidence form
-#     case_number = request.GET.get('case_number', '')
-#     return render(request, 'evidence/add_evidence.html', {'case_number': case_number})
-
-from django.core.files.storage import FileSystemStorage
-from django.utils import timezone
-
-
-from django.shortcuts import render, redirect
-from django.http import HttpResponse
-from pymongo import MongoClient
-import gridfs
-from django.utils import timezone
-
-fs = gridfs.GridFS(db)
-
-# def add_evidence(request):
-#     if request.method == 'POST':
-#         # Get the court case number input from the form
-#         court_case_number = request.POST.get('court_case_number')
-
-#         # Retrieve the case object by case number
-#         case = get_case_by_number(court_case_number)
-        
-#         if case:
-#             # Extract case_id from the case object
-#             case_id = case.get('_id')  # or 'id' depending on your MongoDB setup
-
-#             # Now extract other form data
-#             evidence_type = request.POST.get('evidence_type')
-#             evidence_description = request.POST.get('evidence_description')
-#             collected_by = request.POST.get('collected_by')
-#             remarks = request.POST.get('remarks', '')  # Optional field
-#             upload_date = timezone.now()  # Use current timestamp for upload date
-
-#             # Handle file upload
-#             uploaded_file = request.FILES.get('file')  # Handle file upload from form
-#             if uploaded_file:
-#                 # Save the file to GridFS
-#                 file_id = fs.put(uploaded_file.read(), filename=uploaded_file.name)
-#                 file_type = uploaded_file.content_type  # Extract file type (e.g., image/jpeg)
-#                 file_name = uploaded_file.name  # Original file name
-#                 file_size = uploaded_file.size  # File size in bytes
-
-#                 # Construct the files array as required by the schema
-#                 files = [{
-#                     'file_id': file_id,
-#                     'file_type': file_type,
-#                     'file_name': file_name,
-#                     'file_size': file_size
-#                 }]
-#             else:
-#                 # Handle the case where no file is uploaded (you could set an empty array or handle an error)
-#                 files = []
-
-#             # Create the evidence document to be inserted into MongoDB
-#             new_evidence = {
-#                 'case_id': case_id,
-#                 'evidence_type': evidence_type,
-#                 'evidence_description': evidence_description,
-#                 'collected_by': collected_by,
-#                 'upload_date': upload_date,
-#                 'remarks': remarks,
-#                 'files': files  # Reference to files in GridFS
-#             }
-
-#             # Insert the document into the evidence collection
-#             try:
-#                 evidence_collection.insert_one(new_evidence)
-#                 return redirect('evidence')  # Redirect to the evidence management page or success page
-#             except Exception as e:
-#                 return HttpResponse(f"Error inserting evidence: {str(e)}", status=500)
-
-#         else:
-#             # Case not found
-#             return HttpResponse("Case not found", status=404)
-
-#     return render(request, 'evidence/add_evidence.html')
-
-
-# def save_file_to_gridfs(file: InMemoryUploadedFile):
-#     """
-#     This function takes an uploaded file (InMemoryUploadedFile or File object),
-#     stores it in GridFS, and returns the GridFS file ID.
-#     """
-#     # Store the file in GridFS
-#     file_id = fs.put(file, filename=file.name, content_type=file.content_type)
-#     return file_id
-
-# def get_file_from_gridfs(file_id):
-#     file = fs.get(file_id)  # Retrieve file from GridFS using file_id
-#     return file
-
-
-# def view_file(request, file_id):
-#     try:
-#         # Get the file from GridFS using the file_id
-#         print(f"File ID: {file_id}")
-
-#         file = fs.get(file_id)
-#         response = HttpResponse(file, content_type=file.content_type)
-        
-#         # Set appropriate headers to suggest that the browser should display the file
-#         # If it's an image or pdf, the browser will try to display it
-#         if file.content_type.startswith('image'):
-#             response['Content-Type'] = file.content_type
-#         elif file.content_type == 'application/pdf':
-#             response['Content-Type'] = 'application/pdf'
-#         else:
-#             response['Content-Type'] = 'application/octet-stream'  # For generic files, use this type
-
-#         return response
-#     except gridfs.errors.NoFile:
-#         return HttpResponse("File not found", status=404)
-
-import logging
-# Initialize logger
-logger = logging.getLogger(__name__)
-
-def add_evidence(request):
-    if request.method == 'POST':
-        # Get the court case number input from the form
-        court_case_number = request.POST.get('court_case_number')
-
-        # Retrieve the case object by case number
-        case = get_case_by_number(court_case_number)
-        
-        if case:
-            # Extract case_id from the case object
-            case_id = case.get('_id')  # or 'id' depending on your MongoDB setup
-
-            # Now extract other form data
-            evidence_type = request.POST.get('evidence_type')
-            evidence_description = request.POST.get('evidence_description')
-            collected_by = request.POST.get('collected_by')
-            remarks = request.POST.get('remarks', '')  # Optional field
-            upload_date = timezone.now()  # Use current timestamp for upload date
-
-            # Handle file upload
-            print(request.FILES.get('file'))
-
-            uploaded_file = request.FILES.get('file')
-
-# Debugging: Check if the file object is retrieved
-            if uploaded_file:
-                print(f"File Name: {uploaded_file.name}")
-                print(f"File Size: {uploaded_file.size} bytes")
-                print(f"File Type: {uploaded_file.content_type}")
-            else:
-                print("No file uploaded.")
-
-
-            if uploaded_file:
-                try:
-                    # Save the file to GridFS
-                    # Save the file to GridFS
-                    file_id = fs.put(uploaded_file.read(), filename=uploaded_file.name, content_type=uploaded_file.content_type)
-
-                    print(f"File saved with ID: {file_id}")
-
-                    file_type = uploaded_file.content_type  # Extract file type (e.g., image/jpeg)
-                    file_name = uploaded_file.name  # Original file name
-                    file_size = uploaded_file.size  # File size in bytes
-
-                    # Log the file upload info
-                    logger.info(f"File uploaded: {file_name}, file_id: {file_id}")
-
-                    # Construct the files array as required by the schema
-                    files = [{
-                        'file_id': file_id,
-                        'file_type': file_type,
-                        'file_name': file_name,
-                        'file_size': file_size
-                    }]
-                except Exception as e:
-                    logger.error(f"Error saving file: {str(e)}")
-                    return HttpResponse(f"Error saving file: {str(e)}", status=500)
-            else:
-                files = [] 
-                print("No file uploaded") # No file uploaded
-
-            # Create the evidence document to be inserted into MongoDB
-            new_evidence = {
-                'case_id': case_id,
-                'evidence_type': evidence_type,
-                'evidence_description': evidence_description,
-                'collected_by': collected_by,
-                'upload_date': upload_date,
-                'remarks': remarks,
-                'files': files  # Reference to files in GridFS
-            }
-
-            # Insert the document into the evidence collection
-            try:
-                evidence_collection.insert_one(new_evidence)
-                return redirect('evidence')  # Redirect to the evidence management page or success page
-            except Exception as e:
-                logger.error(f"Error inserting evidence into database: {str(e)}")
-                return HttpResponse(f"Error inserting evidence into database: {str(e)}", status=500)
-
-        else:
-            # Case not found
-            logger.warning(f"Case not found for court case number: {court_case_number}")
-            return HttpResponse("Case not found", status=404)
-
-    return render(request, 'evidence/add_evidence.html')
-
-from bson import ObjectId
-
-# def view_file(request, file_id):
-#     try:
-#         # Convert the file_id from string to ObjectId if it's a valid string representation
-#         if isinstance(file_id, str):
-#             file_id = ObjectId(file_id)
-
-#         # Log the file_id being requested
-#         logger.info(f"Attempting to retrieve file with file_id: {file_id}")
-
-#         # Get the file from GridFS using the file_id
-#         file = fs.get(file_id)
-
-#         # Log if file is found
-#         logger.info(f"File found with file_id: {file_id}, filename: {file.filename}")
-
-#         # Serve the file to the client
-#         response = HttpResponse(file, content_type=file.content_type)
-        
-#         # Set appropriate headers based on file type
-#         if file.content_type.startswith('image'):
-#             response['Content-Type'] = file.content_type
-#         elif file.content_type == 'application/pdf':
-#             response['Content-Type'] = 'application/pdf'
-#         else:
-#             response['Content-Type'] = 'application/octet-stream'  # For generic files, use this type
-
-#         # Optionally, you can set a file download header if you want users to download the file directly
-#         # response['Content-Disposition'] = f'attachment; filename="{file.filename}"'
-
-#         return response
-#     except gridfs.errors.NoFile:
-#         # Log error if file is not found
-#         logger.error(f"File not found with file_id: {file_id}")
-#         return HttpResponse("File not found", status=404)
-#     except Exception as e:
-#         # Log any other errors
-#         logger.error(f"Error retrieving file: {str(e)}")
-#         return HttpResponse(f"Error retrieving file: {str(e)}", status=500)
-
-# def view_file(request, file_id):
-#     try:
-#         # Convert the file_id from string to ObjectId if it's a valid string representation
-#         if isinstance(file_id, str):
-#             file_id = ObjectId(file_id)
-
-#         # Log the file_id being requested
-#         logger.info(f"Attempting to retrieve file with file_id: {file_id}")
-
-#         # Get the file from GridFS using the file_id
-#         file = fs.get(file_id)
-
-#         # Check if file is retrieved successfully
-#         if not file:
-#             logger.error(f"File not found for file_id: {file_id}")
-#             return HttpResponse("File not found", status=404)
-
-#         # Log the file details
-#         logger.info(f"File found with file_id: {file_id}, filename: {file.filename}, content_type: {file.content_type}")
-
-#         # Ensure content_type is not None before proceeding
-#         if file.content_type is None:
-#             logger.error(f"File content_type is None for file_id: {file_id}")
-#             return HttpResponse("File content type is missing", status=500)
-
-#         # Serve the file to the client
-#         response = HttpResponse(file, content_type=file.content_type)
-
-#         # Set appropriate headers based on file type
-#         if file.content_type.startswith('image'):
-#             response['Content-Type'] = file.content_type
-#         elif file.content_type == 'application/pdf':
-#             response['Content-Type'] = 'application/pdf'
-#         else:
-#             response['Content-Type'] = 'application/octet-stream'  # For generic files, use this type
-
-#         return response
-#     except gridfs.errors.NoFile:
-#         # Log error if file is not found
-#         logger.error(f"File not found with file_id: {file_id}")
-#         return HttpResponse("File not found", status=404)
-#     except Exception as e:
-#         # Log any other errors
-#         logger.error(f"Error retrieving file: {str(e)}")
-#         return HttpResponse(f"Error retrieving file: {str(e)}", status=500)
-    
+# Function to view a file (decrypt and serve it)
 
 def view_file(request, file_id):
     try:
         if isinstance(file_id, str):
-             file_id = ObjectId(file_id)
-        # Ensure file_id is being correctly parsed
-        print(f"Retrieving file with ID: {file_id}")
-        
-        
-        # Try to get the file from GridFS using the file_id
-        file = fs.get(file_id)
-        print(f"File retrieved: {file.filename}")
-        print(f"File Type: {file.content_type}")
+            file_id = ObjectId(file_id)
 
-        
-        response = HttpResponse(file, content_type=file.content_type)
-        
-        # Handle file types for displaying in the browser
+        # Retrieve the file from GridFS
+        file = fs.get(file_id)
+
+        # Decrypt the file content
+        decrypted_content = decrypt_file(file.read())
+
+        # Serve the decrypted content based on content type
+        response = HttpResponse(decrypted_content, content_type=file.content_type)
+
         if file.content_type.startswith('image'):
             response['Content-Type'] = file.content_type
         elif file.content_type == 'application/pdf':
             response['Content-Type'] = 'application/pdf'
         elif file.content_type == 'text/plain':
-            response['Content-Type'] = 'text/plain'  # Handle plain text
+            response['Content-Type'] = 'text/plain'
         else:
-            response['Content-Type'] = 'application/octet-stream'  # For generic files
-        CHUNK_SIZE = 8192  # 8 KB chunks
-        with file as f:
-            for chunk in iter(lambda: f.read(CHUNK_SIZE), b''):
-                response.write(chunk)
-        
+            response['Content-Type'] = 'application/octet-stream'
+
         return response
-    
     except gridfs.errors.NoFile:
-        print(f"File with ID {file_id} not found.")
         return HttpResponse("File not found", status=404)
+    except Exception as e:
+        return HttpResponse(f"Error retrieving file: {str(e)}", status=500)
+

@@ -126,6 +126,13 @@ USE_I18N = True
 
 USE_TZ = True
 
+# settings.py
+
+# Encryption settings (make sure to choose secure random keys)
+ENCRYPTION_KEY = bytes.fromhex('daf6b07ebd9565c1612d51864cfd054cad0dc864510a3fa2f05f76bd3ae5bac5')  # 256-bit key (32 bytes)
+ENCRYPTION_IV = bytes.fromhex('6e71440df42ed335ae525bbf14eaa811')  # 128-bit IV (16 bytes)
+   # AES requires a 16-byte IV (128 bits)
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
