@@ -833,10 +833,10 @@ import gridfs
 from bson import ObjectId
 
 # Custom imports
-from .db import *  # Import the MongoDB connection
-from .utils import *
+from .db import *  
+from .encryption import *
 
-
+fs = gridfs.GridFS(db)
 
 logger = logging.getLogger(__name__)
 
@@ -845,37 +845,6 @@ logger = logging.getLogger(__name__)
 def home(request):
     return render(request, 'evidence/index.html')
 
-# def login_view(request):
-#     if request.method == 'POST':
-#         # Bypass authentication for testing purposes
-#         return redirect('dashboard')  # Directly redirect to the dashboard page
-    
-#     return render(request, 'evidence/login.html')
-
-
-
-# def login_view(request):
-#     if request.method == 'POST':
-#         email = request.POST.get('email')
-#         password = request.POST.get('password')
-        
-#         user = users_collection.find_one({"email": email})
-        
-#         if user:
-#             # Check if the password matches (you might want to hash the password before comparing)
-#             if user['password'] == password:
-#                 # Login success, redirect to dashboard
-#                 return redirect('dashboard')
-#             else:
-#                 # Incorrect password
-#                 messages.error(request, 'Invalid password')
-#         else:
-#             # User not found
-#             messages.error(request, 'No user found with this email')
-        
-#         return redirect('login')  # Redirect back to login page if authentication fails
-
-#     return render(request, 'evidence/login.html')
 import logging
 
 # Set up logging
@@ -895,8 +864,7 @@ def login_view(request):
         user = users_collection.find_one({'email': email})
 
         if user and check_password(password, user['password']):
-            # Password matches, log in the user
-            # Convert ObjectId to string before saving in the session
+
             request.session['user_id'] = str(user['_id'])
             return redirect('dashboard')
         else:
@@ -1007,28 +975,6 @@ def evidence(request):
 
 
 
-fs = gridfs.GridFS(db)
-
-# Encryption and Decryption functions
-def get_cipher():
-    key = settings.ENCRYPTION_KEY  # Already in bytes
-    iv = settings.ENCRYPTION_IV  # Already in bytes
-    cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
-    return cipher
-
-def encrypt_content(plain_text):
-    cipher = get_cipher()
-    encryptor = cipher.encryptor()
-    padded_data = plain_text + (16 - len(plain_text) % 16) * ' '
-    encrypted_data = encryptor.update(padded_data.encode('utf-8')) + encryptor.finalize()
-    return base64.b64encode(encrypted_data).decode('utf-8')
-
-def decrypt_content(encrypted_text):
-    cipher = get_cipher()
-    decryptor = cipher.decryptor()
-    encrypted_data = base64.b64decode(encrypted_text)
-    decrypted_data = decryptor.update(encrypted_data) + decryptor.finalize()
-    return decrypted_data.decode('utf-8').rstrip()  # Remove padding
 
 
 def add_case(request):
@@ -1189,11 +1135,6 @@ def cases(request):
 
 
 
-SECRET_KEY = b'YourSecureKeyHere'  # 16 bytes for AES-128 (or 32 bytes for AES-256)
-
-
-
-# Helper function to get case by court case number
 def get_case_by_number(court_case_number):
     return cases_collection.find_one({'court_case_number': encrypt_content(court_case_number)})
 
@@ -1202,21 +1143,6 @@ def get_evidence_by_case_id(case_id):
     return list(evidence_collection.find({'case_id': case_id}))
 
 
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import padding
-
-def encrypt_file(file_data):
-    # Encrypt the file content using the same key and IV from settings
-    cipher = Cipher(algorithms.AES(settings.ENCRYPTION_KEY), modes.CBC(settings.ENCRYPTION_IV), backend=default_backend())
-    encryptor = cipher.encryptor()
-
-    # Pad the file data
-    padder = padding.PKCS7(128).padder()
-    padded_data = padder.update(file_data) + padder.finalize()
-
-    encrypted_data = encryptor.update(padded_data) + encryptor.finalize()
-    return encrypted_data
 
 def add_evidence(request):
     if request.method == 'POST':
@@ -1306,20 +1232,6 @@ def evidence_view(request):
         'court_case_number': court_case_number,  # Pass court_case_number to the template
         'evidence_list': evidence_list,  # Pass the evidence list to the template
     })
-
-
-def decrypt_file(encrypted_file_data):
-    cipher = Cipher(algorithms.AES(settings.ENCRYPTION_KEY), modes.CBC(settings.ENCRYPTION_IV), backend=default_backend())
-    decryptor = cipher.decryptor()
-
-    # Decrypt the file data
-    decrypted_data = decryptor.update(encrypted_file_data) + decryptor.finalize()
-
-    # Unpad the decrypted data
-    unpadder = padding.PKCS7(128).unpadder()
-    unpadded_data = unpadder.update(decrypted_data) + unpadder.finalize()
-
-    return unpadded_data
 
 # Function to view a file (decrypt and serve it)
 
