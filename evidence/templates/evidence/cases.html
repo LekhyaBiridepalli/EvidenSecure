@@ -26,9 +26,9 @@
     <aside class="bg-primary text-white p-4" style="position: fixed; top: 0; left: 0; bottom: 0; width: 250px;">
         <br><br><br>
         <ul class="nav flex-column">
-            <li class="nav-item"><a class="nav-link text-white" href="{% url 'dashboard' %}"">Homepage</a></li>
+            <li class="nav-item"><a class="nav-link text-white" href="{% url 'dashboard' %}">Homepage</a></li>
             <li class="nav-item"><a class="nav-link text-white" href="{% url 'cases' %}">Cases Management</a></li>
-            <li class="nav-item"><a class="nav-link text-white" href="{% url 'evidence' %}"">Evidence Management</a></li>
+            <li class="nav-item"><a class="nav-link text-white" href="{% url 'evidence' %}">Evidence Management</a></li>
             <li class="nav-item"><a class="nav-link text-white" href="#reports">Reports</a></li>
             <li class="nav-item"><a class="nav-link text-white" href="#tracking">Tracking System</a></li>
             <li class="nav-item"><a class="nav-link text-white" href="#logs">Audit Logs</a></li>
@@ -37,7 +37,7 @@
     </aside>
 
     <!-- Main Content -->
-    <div class="container" style="margin-left: 250px; padding-top: 20px;">
+    <div class="container" style="margin-left: 250px; margin-right: 20px; padding-top: 20px;">
         <header class="d-flex justify-content-between align-items-center mb-4">
             <h1>EvidenSecure - Cases Management</h1>
             <div class="d-flex align-items-center">
@@ -52,47 +52,81 @@
                     <ul class="dropdown-menu" aria-labelledby="profileDropdown">
                         <li><a class="dropdown-item" href="#">Profile</a></li>
                         <li><a class="dropdown-item" href="#">Settings</a></li>
-                        <li><a class="dropdown-item" href="{% url 'home' %}">Logout</a></li>
+                        <li><a class="dropdown-item" href="{%url 'home'%}">Logout</a></li>
                     </ul>
                 </div>
             </div>
         </header>
 
-        <!-- Cases Management Section -->
-        <section id="cases" class="mb-4">
-            <h2>Manage Cases</h2>
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5>Create New Case</h5>
-                            <p>Form to create new cases.</p>
-                            <button class="btn btn-primary">Create Case</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5>Case List</h5>
-                            <ul class="list-group">
-                                <li class="list-group-item">Case [Case ID] - [Status]</li>
-                                <li class="list-group-item">Case [Case ID] - [Status]</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5>Case Search</h5>
-                            <input type="text" class="form-control" placeholder="Search Cases">
-                            <button class="btn btn-primary mt-2">Search</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <!-- Create Case Section -->
+        <section class="mb-4">
+            <h2 class="mb-3">Create New Case</h2>
+            <a href="{% url 'add_case' %}" class="btn btn-primary btn-lg">Create Case</a>
         </section>
+
+        <div class="row">
+            <!-- Search Cases Section -->
+            <div class="col-md-6 mb-4">
+                <section>
+                    <h3 class="mb-3">Search Cases</h3>
+                    <form method="get" action="{% url 'cases' %}">
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="query" placeholder="Search cases" value="{{ request.GET.query }}">
+                            <button type="submit" class="btn btn-primary">Search</button>
+                        </div>
+                    </form>
+        
+                    <h4 class="mt-4">Search Results</h4>
+                    {% if search_results %}
+                        <div class="list-group">
+                            {% for case in search_results %}
+                                <a href="{% url 'case_detail' case.case_id %}" class="list-group-item list-group-item-action">
+                                    <strong>Case Type:</strong> {{ case.case_type }} - 
+                                    <strong>Case Number:</strong> {{ case.court_case_number }} - 
+                                    <strong>Accused:</strong> 
+                                    {% if case.accused_names %}
+                                        {% for accused in case.accused_names %}
+                                            {{ accused }}{% if not forloop.last %}, {% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p>No search results found.</p>
+                    {% endif %}
+                </section>
+            </div>
+        
+            <!-- All Cases Section -->
+            <div class="col-md-6">
+                <section>
+                    <h4 class="mb-3">All Cases List</h4>
+                    {% if all_cases %}
+                        <div class="list-group">
+                            {% for case in all_cases %}
+                                <a href="{% url 'case_detail' case.case_id %}" class="list-group-item list-group-item-action">
+                                    <strong>Case Type:</strong> {{ case.case_type }} - 
+                                    <strong>Case Number:</strong> {{ case.court_case_number }} - 
+                                    <strong>Accused:</strong> 
+                                    {% if case.accused_names %}
+                                        {% for accused in case.accused_names %}
+                                            {{ accused }}{% if not forloop.last %}, {% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p>No cases available.</p>
+                    {% endif %}
+                </section>
+            </div>
+        </div>
     </div>
 
     <!-- Bootstrap JS and dependencies -->

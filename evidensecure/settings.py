@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     
-   
+    # Your app
     'evidence',
 ]
 
@@ -77,21 +77,20 @@ WSGI_APPLICATION = 'evidensecure.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
+
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'djongo',
-#         'NAME': 'evidensecure_db',  # Name of your MongoDB database
-#         'ENFORCE_SCHEMA': False,    # Optional: Disable strict schema enforcement
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
-
-
 # MongoDB Configuration
-MONGO_DB_SETTINGS = {
+MONGODB_SETTINGS = {
     'DB_NAME': 'EvidenSecure_db',
     'HOST': 'localhost',
     'PORT': 27017,
 }
+
 
 
 # Password validation

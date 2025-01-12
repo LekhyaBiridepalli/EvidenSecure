@@ -1,0 +1,71 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="EvidenSecure - Add Evidence" name="description">
+    <title>EvidenSecure - Add Evidence</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="{% static 'css/dash.css' %}" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside class="bg-primary text-white p-4" style="position: fixed; top: 0; left: 0; bottom: 0; width: 250px;">
+        <br><br><br>
+        <ul class="nav flex-column">
+            <li class="nav-item"><a class="nav-link text-white" href="{% url 'dashboard' %}">Homepage</a></li>
+            <li class="nav-item"><a class="nav-link text-white" href="{% url 'cases' %}">Cases Management</a></li>
+            <li class="nav-item"><a class="nav-link text-white" href="{% url 'evidence' %}">Evidence Management</a></li>
+            <li class="nav-item"><a class="nav-link text-white" href="#reports">Reports</a></li>
+            <li class="nav-item"><a class="nav-link text-white" href="#tracking">Tracking System</a></li>
+            <li class="nav-item"><a class="nav-link text-white" href="#logs">Audit Logs</a></li>
+            <li class="nav-item"><a class="nav-link text-white" href="#settings">Settings</a></li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="container" style="margin-left: 250px; padding-top: 20px;">
+        <header class="d-flex justify-content-between align-items-center mb-4">
+            <h1>EvidenSecure - Add Evidence</h1>
+        </header>
+
+        <!-- Add Evidence Form -->
+        <section id="add_evidence" class="mb-4">
+            <!-- Inside evidence.html -->
+<form method="post" action="{% url 'add_evidence' %}" class="mb-4">
+    {% csrf_token %}
+    <label for="court_case_number" class="form-label">Enter Court Case Number:</label>
+    <input type="text" class="form-control" id="court_case_number" name="court_case_number" placeholder="Enter Court Case Number" required>
+    
+    <!-- Fields for evidence information -->
+    <label for="evidence_type" class="form-label">Evidence Type:</label>
+    <input type="text" class="form-control" id="evidence_type" name="evidence_type" required>
+    
+    <label for="evidence_description" class="form-label">Evidence Description:</label>
+    <textarea class="form-control" id="evidence_description" name="evidence_description" required></textarea>
+    
+    <label for="collected_by" class="form-label">Collected By:</label>
+    <input type="text" class="form-control" id="collected_by" name="collected_by" required>
+    
+    <label for="file" class="form-label">Evidence File:</label>
+    <input type="file" class="form-control" id="file" name="file">
+
+    <button type="submit" class="btn btn-success mt-2">Add Evidence</button>
+</form>
+
+            
+        </section>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+</body>
+</html>
