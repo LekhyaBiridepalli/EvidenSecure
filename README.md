@@ -112,9 +112,6 @@ git clone https://github.com/ifrahnz26/evidensecure.git
 - **Evidence**: Manages evidence files and associated metadata.  
 - **Cases**: Tracks cases and their linkage to evidence and investigators.  
 
-<img width="300" height = "200" alt="Screenshot 2025-01-12 at 6 44 12 PM" src="https://github.com/user-attachments/assets/3a9efe5f-d993-4566-8d1c-2d492901e47b" />
-<img width="300" height = "200" alt="Screenshot 2025-01-12 at 6 44 20 PM" src="https://github.com/user-attachments/assets/efcc7857-82e6-4567-b405-f1a29b4d50e6" />
-
 
 ---
 
