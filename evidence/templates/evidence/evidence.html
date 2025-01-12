@@ -96,11 +96,13 @@
                     <td>{{ evidence.upload_date }}</td>
                     <td>{{ evidence.remarks }}</td>
                     <td>
-                        {% if evidence.file %}
-                            <a href="{{ evidence.file }}" download>Download File</a>
-                        {% else %}
-                            No File
-                        {% endif %}
+                        {% if evidence.files %}
+        {% for file in evidence.files %}
+        <a href="{% url 'view_file' file.file_id %}" target="_blank">View File</a>
+        {% endfor %}
+    {% else %}
+        No File
+    {% endif %}
                     </td>
                 </tr>
             {% endfor %}

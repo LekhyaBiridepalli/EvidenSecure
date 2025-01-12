@@ -39,27 +39,26 @@
         <!-- Add Evidence Form -->
         <section id="add_evidence" class="mb-4">
             <!-- Inside evidence.html -->
-<form method="post" action="{% url 'add_evidence' %}" class="mb-4">
-    {% csrf_token %}
-    <label for="court_case_number" class="form-label">Enter Court Case Number:</label>
-    <input type="text" class="form-control" id="court_case_number" name="court_case_number" placeholder="Enter Court Case Number" required>
-    
-    <!-- Fields for evidence information -->
-    <label for="evidence_type" class="form-label">Evidence Type:</label>
-    <input type="text" class="form-control" id="evidence_type" name="evidence_type" required>
-    
-    <label for="evidence_description" class="form-label">Evidence Description:</label>
-    <textarea class="form-control" id="evidence_description" name="evidence_description" required></textarea>
-    
-    <label for="collected_by" class="form-label">Collected By:</label>
-    <input type="text" class="form-control" id="collected_by" name="collected_by" required>
-    
-    <label for="file" class="form-label">Evidence File:</label>
-    <input type="file" class="form-control" id="file" name="file">
-
-    <button type="submit" class="btn btn-success mt-2">Add Evidence</button>
-</form>
-
+            <form method="post" action="{% url 'add_evidence' %}" class="mb-4" enctype="multipart/form-data">
+                {% csrf_token %}
+                <label for="court_case_number" class="form-label">Enter Court Case Number:</label>
+                <input type="text" class="form-control" id="court_case_number" name="court_case_number" placeholder="Enter Court Case Number" required>
+                
+                <!-- Fields for evidence information -->
+                <label for="evidence_type" class="form-label">Evidence Type:</label>
+                <input type="text" class="form-control" id="evidence_type" name="evidence_type" required>
+                
+                <label for="evidence_description" class="form-label">Evidence Description:</label>
+                <textarea class="form-control" id="evidence_description" name="evidence_description" required></textarea>
+                
+                <label for="collected_by" class="form-label">Collected By:</label>
+                <input type="text" class="form-control" id="collected_by" name="collected_by" required>
+                
+                <label for="file" class="form-label">Evidence File:</label>
+                <input type="file" class="form-control" id="file" name="file">
+                
+                <button type="submit" class="btn btn-success mt-2">Add Evidence</button>
+            </form>  
             
         </section>
     </div>

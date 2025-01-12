@@ -667,9 +667,112 @@ from django.utils import timezone
 
 fs = gridfs.GridFS(db)
 
+# def add_evidence(request):
+#     if request.method == 'POST':
+#         # Get the court case number input from the form
+#         court_case_number = request.POST.get('court_case_number')
+
+#         # Retrieve the case object by case number
+#         case = get_case_by_number(court_case_number)
+        
+#         if case:
+#             # Extract case_id from the case object
+#             case_id = case.get('_id')  # or 'id' depending on your MongoDB setup
+
+#             # Now extract other form data
+#             evidence_type = request.POST.get('evidence_type')
+#             evidence_description = request.POST.get('evidence_description')
+#             collected_by = request.POST.get('collected_by')
+#             remarks = request.POST.get('remarks', '')  # Optional field
+#             upload_date = timezone.now()  # Use current timestamp for upload date
+
+#             # Handle file upload
+#             uploaded_file = request.FILES.get('file')  # Handle file upload from form
+#             if uploaded_file:
+#                 # Save the file to GridFS
+#                 file_id = fs.put(uploaded_file.read(), filename=uploaded_file.name)
+#                 file_type = uploaded_file.content_type  # Extract file type (e.g., image/jpeg)
+#                 file_name = uploaded_file.name  # Original file name
+#                 file_size = uploaded_file.size  # File size in bytes
+
+#                 # Construct the files array as required by the schema
+#                 files = [{
+#                     'file_id': file_id,
+#                     'file_type': file_type,
+#                     'file_name': file_name,
+#                     'file_size': file_size
+#                 }]
+#             else:
+#                 # Handle the case where no file is uploaded (you could set an empty array or handle an error)
+#                 files = []
+
+#             # Create the evidence document to be inserted into MongoDB
+#             new_evidence = {
+#                 'case_id': case_id,
+#                 'evidence_type': evidence_type,
+#                 'evidence_description': evidence_description,
+#                 'collected_by': collected_by,
+#                 'upload_date': upload_date,
+#                 'remarks': remarks,
+#                 'files': files  # Reference to files in GridFS
+#             }
+
+#             # Insert the document into the evidence collection
+#             try:
+#                 evidence_collection.insert_one(new_evidence)
+#                 return redirect('evidence')  # Redirect to the evidence management page or success page
+#             except Exception as e:
+#                 return HttpResponse(f"Error inserting evidence: {str(e)}", status=500)
+
+#         else:
+#             # Case not found
+#             return HttpResponse("Case not found", status=404)
+
+#     return render(request, 'evidence/add_evidence.html')
+
+
+# def save_file_to_gridfs(file: InMemoryUploadedFile):
+#     """
+#     This function takes an uploaded file (InMemoryUploadedFile or File object),
+#     stores it in GridFS, and returns the GridFS file ID.
+#     """
+#     # Store the file in GridFS
+#     file_id = fs.put(file, filename=file.name, content_type=file.content_type)
+#     return file_id
+
+# def get_file_from_gridfs(file_id):
+#     file = fs.get(file_id)  # Retrieve file from GridFS using file_id
+#     return file
+
+
+# def view_file(request, file_id):
+#     try:
+#         # Get the file from GridFS using the file_id
+#         print(f"File ID: {file_id}")
+
+#         file = fs.get(file_id)
+#         response = HttpResponse(file, content_type=file.content_type)
+        
+#         # Set appropriate headers to suggest that the browser should display the file
+#         # If it's an image or pdf, the browser will try to display it
+#         if file.content_type.startswith('image'):
+#             response['Content-Type'] = file.content_type
+#         elif file.content_type == 'application/pdf':
+#             response['Content-Type'] = 'application/pdf'
+#         else:
+#             response['Content-Type'] = 'application/octet-stream'  # For generic files, use this type
+
+#         return response
+#     except gridfs.errors.NoFile:
+#         return HttpResponse("File not found", status=404)
+
+import logging
+# Initialize logger
+logger = logging.getLogger(__name__)
+
 def add_evidence(request):
     if request.method == 'POST':
-        # Get the case number input from the form
+        # Get the court case number input from the form
         court_case_number = request.POST.get('court_case_number')
 
         # Retrieve the case object by case number
@@ -687,24 +790,47 @@ def add_evidence(request):
             upload_date = timezone.now()  # Use current timestamp for upload date
 
             # Handle file upload
-            uploaded_file = request.FILES.get('file')  # Handle file upload from form
-            if uploaded_file:
-                # Save the file to GridFS
-                file_id = fs.put(uploaded_file.read(), filename=uploaded_file.name)
-                file_type = uploaded_file.content_type  # Extract file type (e.g., image/jpeg)
-                file_name = uploaded_file.name  # Original file name
-                file_size = uploaded_file.size  # File size in bytes
+            print(request.FILES.get('file'))
 
-                # Construct the files array as required by the schema
-                files = [{
-                    'file_id': file_id,
-                    'file_type': file_type,
-                    'file_name': file_name,
-                    'file_size': file_size
-                }]
+            uploaded_file = request.FILES.get('file')
+
+# Debugging: Check if the file object is retrieved
+            if uploaded_file:
+                print(f"File Name: {uploaded_file.name}")
+                print(f"File Size: {uploaded_file.size} bytes")
+                print(f"File Type: {uploaded_file.content_type}")
             else:
-                # Handle the case where file is not uploaded (you could set an empty array or handle error)
-                files = []
+                print("No file uploaded.")
+
+
+            if uploaded_file:
+                try:
+                    # Save the file to GridFS
+                    # Save the file to GridFS
+                    file_id = fs.put(uploaded_file.read(), filename=uploaded_file.name, content_type=uploaded_file.content_type)
+
+                    print(f"File saved with ID: {file_id}")
+
+                    file_type = uploaded_file.content_type  # Extract file type (e.g., image/jpeg)
+                    file_name = uploaded_file.name  # Original file name
+                    file_size = uploaded_file.size  # File size in bytes
+
+                    # Log the file upload info
+                    logger.info(f"File uploaded: {file_name}, file_id: {file_id}")
+
+                    # Construct the files array as required by the schema
+                    files = [{
+                        'file_id': file_id,
+                        'file_type': file_type,
+                        'file_name': file_name,
+                        'file_size': file_size
+                    }]
+                except Exception as e:
+                    logger.error(f"Error saving file: {str(e)}")
+                    return HttpResponse(f"Error saving file: {str(e)}", status=500)
+            else:
+                files = [] 
+                print("No file uploaded") # No file uploaded
 
             # Create the evidence document to be inserted into MongoDB
             new_evidence = {
@@ -722,24 +848,136 @@ def add_evidence(request):
                 evidence_collection.insert_one(new_evidence)
                 return redirect('evidence')  # Redirect to the evidence management page or success page
             except Exception as e:
-                return HttpResponse(f"Error inserting evidence: {str(e)}", status=500)
+                logger.error(f"Error inserting evidence into database: {str(e)}")
+                return HttpResponse(f"Error inserting evidence into database: {str(e)}", status=500)
 
         else:
             # Case not found
+            logger.warning(f"Case not found for court case number: {court_case_number}")
             return HttpResponse("Case not found", status=404)
 
     return render(request, 'evidence/add_evidence.html')
 
+from bson import ObjectId
 
-def save_file_to_gridfs(file: InMemoryUploadedFile):
-    """
-    This function takes an uploaded file (InMemoryUploadedFile or File object),
-    stores it in GridFS, and returns the GridFS file ID.
-    """
-    # Store the file in GridFS
-    file_id = fs.put(file, filename=file.name, content_type=file.content_type)
-    return file_id
+# def view_file(request, file_id):
+#     try:
+#         # Convert the file_id from string to ObjectId if it's a valid string representation
+#         if isinstance(file_id, str):
+#             file_id = ObjectId(file_id)
 
-def get_file_from_gridfs(file_id):
-    file = fs.get(file_id)  # Retrieve file from GridFS using file_id
-    return file
+#         # Log the file_id being requested
+#         logger.info(f"Attempting to retrieve file with file_id: {file_id}")
+
+#         # Get the file from GridFS using the file_id
+#         file = fs.get(file_id)
+
+#         # Log if file is found
+#         logger.info(f"File found with file_id: {file_id}, filename: {file.filename}")
+
+#         # Serve the file to the client
+#         response = HttpResponse(file, content_type=file.content_type)
+        
+#         # Set appropriate headers based on file type
+#         if file.content_type.startswith('image'):
+#             response['Content-Type'] = file.content_type
+#         elif file.content_type == 'application/pdf':
+#             response['Content-Type'] = 'application/pdf'
+#         else:
+#             response['Content-Type'] = 'application/octet-stream'  # For generic files, use this type
+
+#         # Optionally, you can set a file download header if you want users to download the file directly
+#         # response['Content-Disposition'] = f'attachment; filename="{file.filename}"'
+
+#         return response
+#     except gridfs.errors.NoFile:
+#         # Log error if file is not found
+#         logger.error(f"File not found with file_id: {file_id}")
+#         return HttpResponse("File not found", status=404)
+#     except Exception as e:
+#         # Log any other errors
+#         logger.error(f"Error retrieving file: {str(e)}")
+#         return HttpResponse(f"Error retrieving file: {str(e)}", status=500)
+
+# def view_file(request, file_id):
+#     try:
+#         # Convert the file_id from string to ObjectId if it's a valid string representation
+#         if isinstance(file_id, str):
+#             file_id = ObjectId(file_id)
+
+#         # Log the file_id being requested
+#         logger.info(f"Attempting to retrieve file with file_id: {file_id}")
+
+#         # Get the file from GridFS using the file_id
+#         file = fs.get(file_id)
+
+#         # Check if file is retrieved successfully
+#         if not file:
+#             logger.error(f"File not found for file_id: {file_id}")
+#             return HttpResponse("File not found", status=404)
+
+#         # Log the file details
+#         logger.info(f"File found with file_id: {file_id}, filename: {file.filename}, content_type: {file.content_type}")
+
+#         # Ensure content_type is not None before proceeding
+#         if file.content_type is None:
+#             logger.error(f"File content_type is None for file_id: {file_id}")
+#             return HttpResponse("File content type is missing", status=500)
+
+#         # Serve the file to the client
+#         response = HttpResponse(file, content_type=file.content_type)
+
+#         # Set appropriate headers based on file type
+#         if file.content_type.startswith('image'):
+#             response['Content-Type'] = file.content_type
+#         elif file.content_type == 'application/pdf':
+#             response['Content-Type'] = 'application/pdf'
+#         else:
+#             response['Content-Type'] = 'application/octet-stream'  # For generic files, use this type
+
+#         return response
+#     except gridfs.errors.NoFile:
+#         # Log error if file is not found
+#         logger.error(f"File not found with file_id: {file_id}")
+#         return HttpResponse("File not found", status=404)
+#     except Exception as e:
+#         # Log any other errors
+#         logger.error(f"Error retrieving file: {str(e)}")
+#         return HttpResponse(f"Error retrieving file: {str(e)}", status=500)
+    
+
+def view_file(request, file_id):
+    try:
+        if isinstance(file_id, str):
+             file_id = ObjectId(file_id)
+        # Ensure file_id is being correctly parsed
+        print(f"Retrieving file with ID: {file_id}")
+        
+        
+        # Try to get the file from GridFS using the file_id
+        file = fs.get(file_id)
+        print(f"File retrieved: {file.filename}")
+        print(f"File Type: {file.content_type}")
+
+        
+        response = HttpResponse(file, content_type=file.content_type)
+        
+        # Handle file types for displaying in the browser
+        if file.content_type.startswith('image'):
+            response['Content-Type'] = file.content_type
+        elif file.content_type == 'application/pdf':
+            response['Content-Type'] = 'application/pdf'
+        elif file.content_type == 'text/plain':
+            response['Content-Type'] = 'text/plain'  # Handle plain text
+        else:
+            response['Content-Type'] = 'application/octet-stream'  # For generic files
+        CHUNK_SIZE = 8192  # 8 KB chunks
+        with file as f:
+            for chunk in iter(lambda: f.read(CHUNK_SIZE), b''):
+                response.write(chunk)
+        
+        return response
+    
+    except gridfs.errors.NoFile:
+        print(f"File with ID {file_id} not found.")
+        return HttpResponse("File not found", status=404)

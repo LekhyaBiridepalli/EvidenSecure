@@ -84,12 +84,15 @@ WSGI_APPLICATION = 'evidensecure.wsgi.application'
 #         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
-# MongoDB Configuration
-MONGODB_SETTINGS = {
-    'DB_NAME': 'EvidenSecure_db',
-    'HOST': 'localhost',
-    'PORT': 27017,
-}
+from pymongo import MongoClient
+
+MONGO_DB_NAME = "EvidenSecure_db"
+MONGO_HOST = "localhost"
+MONGO_PORT = 27017
+
+# Initialize the client
+mongo_client = MongoClient(MONGO_HOST, MONGO_PORT)
+mongo_db = mongo_client[MONGO_DB_NAME]
 
 
 

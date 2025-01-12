@@ -12,6 +12,8 @@ urlpatterns = [
     path('add_case/', views.add_case, name='add_case'),
     path('cases/<str:case_id>/', views.case_detail, name='case_detail'),  # Case details view
     path('add_evidence/', views.add_evidence, name='add_evidence'),  # Accept case_number in URL
+    path('view_file/<str:file_id>/', views.view_file, name='view_file'),
+
         
 
 ]
